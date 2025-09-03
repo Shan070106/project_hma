@@ -13,3 +13,9 @@ yarn-error.log*
 frontend/build
 backend/build
 dist/
+
+#Text files
+*.odt
+.~lock.*
+
+
