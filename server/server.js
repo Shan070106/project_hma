@@ -5,13 +5,13 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./config/db.js";
 
-dotenv.config();
+// dotenv.config();
 
 const app = express();
 
 // Middleware
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
+// app.use(cors({ origin: true, credentials: true }));
+// app.use(express.json());
 
 // MongoDB Connection
 // const connectDB = async () => {
@@ -26,16 +26,16 @@ app.use(express.json());
 //     process.exit(1); // Exit process if connection fails
 //   }
 // };
-connectDB();
+// connectDB();
 
 // Routes
-app.use("/api/auth", authRoutes);
+// app.use("/api/auth", authRoutes);
 
 // Health Check Route (to verify backend is running)
 app.get("/", (_req, res) => {
   res.send("Hotel Menu App API is running...");
 });
-
+app.use
 // Global Error Handler
 app.use((err, _req, res, _next) => {
   const status = err.status || 500;
@@ -48,3 +48,4 @@ app.use((err, _req, res, _next) => {
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
