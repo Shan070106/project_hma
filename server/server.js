@@ -1,10 +1,6 @@
 // Middleware
 // app.use(cors({ origin: true, credentials: true }));
 
-
-
-
-
 // // Global Error Handler
 // app.use((err, _req, res, _next) => {
 //   const status = err.status || 500;
@@ -24,7 +20,10 @@ import cors from "cors";
 import morgs from "morgan";
 import dotenv from "dotenv";
 import dbConnection from "./config/db.js";
+
 import authRoutes from "./routes/authRoutes.js";
+import hotelRoutes from "./routes/hotelRoutes.js";
+
 import {errorhandler} from "./middleware/errorhandler.js";
 
 const app = express();
@@ -40,13 +39,14 @@ app.use(morgs('dev'));
 
 //Routes
 app.use("/api/auth",authRoutes);
+app.use("/api/hotels",hotelRoutes);
 
 dbConnection();
 
 //Error Handler Middleware
 app.use(errorhandler);
 
-const PORT = 3000;
+const PORT =process.env.PORT || 5000;
 app.listen(PORT, ()=>{
   console.log("Server began to run on 3000 port");
 });
