@@ -85,7 +85,7 @@ const getUser = asynchandler(async (req,res) => {
     }
     else{
         res.status(404);
-        throw new Error("User not foudn");
+        throw new Error("User not foudn or retrieval failed");
     }
 });
 
@@ -122,8 +122,23 @@ const updateUser = asynchandler(async (req,res) => {
     }
     else{
         res.status(404);
-        throw new Error("User not found");
+        throw new Error("User not found or updation failed");
     }
 });
 
-export {signup, login, getUser,updateUser};
+// Deleting user
+// @ route DELETE /api/user/:id
+const deleteUser = asynchandler(async (req,res) => {
+    const user = await User.findById(req.user.id);
+
+    if(user){
+        await user.deleteOne(user.id);
+        res.json({"User deleted successfully" : true});
+    }
+    else{
+        res.status(404);
+        throw new Error("Invalid user to delete or deletion failed");
+    }
+});
+
+export {signup, login, getUser,updateUser, deleteUser};
