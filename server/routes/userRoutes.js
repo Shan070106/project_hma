@@ -9,7 +9,7 @@ const router = Routes();
 router.post("/signup",requireAuth, signup);
 router.post("/login",requireAuth,login);
 router.get("/:id", requireAuth, getUser);
-// router.put("/:id", requireAuth, updateUser);
+router.put("/:id", requireAuth, updateUser);
 // router.delete("/:id", requireAuth, deleteUser);
 
 export default router;

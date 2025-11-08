@@ -76,6 +76,7 @@ const login = asynchandler(async (req,res) => {
 });
 
 // Reading user details
+// @ route GET/api/user/:id 
 const getUser = asynchandler(async (req,res) => {
     const user = await User.findById(req.user.id).select("-password");
 
@@ -88,4 +89,41 @@ const getUser = asynchandler(async (req,res) => {
     }
 });
 
-export {signup, login, getUser};
+// Updating user details
+
+const updateUser = asynchandler(async (req,res) => {
+    /* data to be updated only extracted otherwise it will be 'undefined' */
+    const {new_username, new_email, new_password } = req.body;
+
+    const user = await User.findById(req.body.id);
+
+    if(user){
+
+        // Updating user details
+        /* new data come through request, so we extracting data from requests
+           data to be updated only be in requests */
+
+        user.username = new_username || user.username;
+        user.email = new_email || user.email;
+        if(new_password){
+            const uppu = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(new_password, uppu);
+        }
+
+        const updatedUser = await user.save();
+
+        res.json({
+            _id       : updatedUser._id,
+            _username : updatedUser.username,
+            _email    : updatedUser.email,
+            token     : generateToken(updatedUser._id)
+        });
+
+    }
+    else{
+        res.status(404);
+        throw new Error("User not found");
+    }
+});
+
+export {signup, login, getUser,updateUser};
