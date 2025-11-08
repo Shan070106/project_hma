@@ -1,5 +1,5 @@
 import asynchandler from "express-async-handler";
-import bcrypt from "bcryptjs";
+import bcrypt, { compare } from "bcryptjs";
 import jwt, { sign } from "jsonwebtoken";
 
 import User from "../models/User.js";
@@ -12,6 +12,7 @@ const generateToken = (id) => {
 }
 
 // Creating user
+// @route POST /api/user/signup
 const signup = asynchandler(async (req, res) => {
     const {_username, _email, _password} = req.body;
 
@@ -54,4 +55,37 @@ const signup = asynchandler(async (req, res) => {
     }
 });
 
-export {signup};
+// User login 
+// @ route POST /api/user/login
+const login = asynchandler(async (req,res) => {
+    const {_username, _email, _password} = req.body;
+
+    const user = await User.findOne({_username, _email});
+    if(user && (await bcrypt.compare(_password,user.password))){
+        res.json({
+            _id : user._id,
+            _username : user.username,
+            _email : user.email,
+            token : generateToken(user.id)
+        })
+    }
+    else{
+        res.status(400);
+        throw new Error("Invalid credentials or password");
+    }
+});
+
+// Reading user details
+const getUser = asynchandler(async (req,res) => {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if(user){
+        res.json(user);
+    }
+    else{
+        res.status(404);
+        throw new Error("User not foudn");
+    }
+});
+
+export {signup, login, getUser};
