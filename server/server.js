@@ -23,6 +23,7 @@ import dbConnection from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import hotelRoutes from "./routes/hotelRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 import {errorhandler} from "./middleware/errorhandler.js";
 
@@ -39,7 +40,8 @@ app.use(morgs('dev'));
 
 //Routes
 app.use("/api/auth",authRoutes);
-app.use("/api/hotels",hotelRoutes);
+app.use("/api/hotel",hotelRoutes);
+app.use("/api/user/",userRoutes);
 
 dbConnection();
 

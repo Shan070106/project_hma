@@ -1,0 +1,134 @@
+this is the updated and finalized :
+/hotel-menu-app
+│
+├── client/                               # React Frontend
+│   ├── node_modules/
+│   ├── public/
+│   │   ├── index.html
+│   │   ├── manifest.json
+│   │   └── favicon.ico
+│   │
+│   ├── src/
+│   │   ├── assets/                       # Static assets
+│   │   │   ├── images/
+│   │   │   ├── fonts/
+│   │   │   └── styles/                   # Global CSS files
+│   │   │       ├── App.css
+│   │   │       └── variables.css
+│   │   │
+│   │   ├── components/                   # Reusable UI Components
+│   │   │   ├── Navbar/
+│   │   │   ├── Footer/
+│   │   │   ├── MenuCard/
+│   │   │   ├── OrderSummary/
+│   │   │   ├── QRCodeDisplay/
+│   │   │   └── PaymentButton/
+│   │   │
+│   │   ├── context/                      # React Contexts for state management
+│   │   │   ├── AuthContext.js
+│   │   │   ├── MenuContext.js
+│   │   │   └── OrderContext.js
+│   │   │
+│   │   ├── hooks/                        # Custom React hooks
+│   │   │   ├── useAuth.js
+│   │   │   ├── useFetch.js
+│   │   │   └── useOrder.js
+│   │   │
+│   │   ├── pages/                        # Main Page Components
+│   │   │   ├── Home/
+│   │   │   │   ├── Home.js
+│   │   │   │   └── Home.css
+│   │   │   ├── Login/
+│   │   │   │   ├── Login.js
+│   │   │   │   └── Login.css
+│   │   │   ├── Signup/
+│   │   │   │   ├── Signup.js
+│   │   │   │   └── Signup.css
+│   │   │   ├── Menu/
+│   │   │   │   ├── MenuPage.js
+│   │   │   │   └── MenuPage.css
+│   │   │   ├── FoodDetails/
+│   │   │   │   ├── FoodDetails.js
+│   │   │   │   └── FoodDetails.css
+│   │   │   ├── Order/
+│   │   │   │   ├── OrderPage.js
+│   │   │   │   └── OrderPage.css
+│   │   │   ├── Payment/
+│   │   │   │   ├── PaymentPage.js
+│   │   │   │   └── PaymentPage.css
+│   │   │   └── Dashboard/
+│   │   │       ├── Dashboard.js
+│   │   │       └── Dashboard.css
+│   │   │
+│   │   ├── services/                     # API call functions (Axios)
+│   │   │   ├── api.js                    # Axios instance setup
+│   │   │   ├── authService.js
+│   │   │   ├── menuService.js
+│   │   │   ├── orderService.js
+│   │   │   └── paymentService.js
+│   │   │
+│   │   ├── utils/                        # Utility/helper functions
+│   │   │   ├── formatCurrency.js
+│   │   │   ├── handleErrors.js
+│   │   │   └── constants.js
+│   │   │
+│   │   ├── App.js
+│   │   └── index.js
+│   │
+│   ├── package.json
+│   ├── .env                              # Frontend environment variables (API URL, etc.)
+│   └── .gitignore
+│
+│
+├── server/                               # Node.js/Express Backend
+│   ├── node_modules/
+│   ├── config/
+│   │   ├── db.js                         # MongoDB connection setup
+│   │   └── cloudinary.js                 # For image uploads (optional)
+│   │
+│   ├── controllers/                      # Business logic
+│   │   ├── authController.js
+│   │   ├── menuController.js
+│   │   ├── orderController.js
+│   │   ├── paymentController.js
+│   │   └── qrController.js
+│   │
+│   ├── middleware/
+│   │   ├── authMiddleware.js             # JWT verification
+│   │   ├── errorHandler.js
+│   │   └── uploadMiddleware.js           # For image uploads (Multer)
+│   │
+│   ├── models/                           # MongoDB Schemas (Mongoose)
+│   │   ├── userModel.js
+│   │   ├── restaurantModel.js
+│   │   ├── menuItemModel.js
+│   │   ├── orderModel.js
+│   │   └── paymentModel.js
+│   │
+│   ├── routes/                           # Route definitions
+│   │   ├── authRoutes.js
+│   │   ├── menuRoutes.js
+│   │   ├── orderRoutes.js
+│   │   ├── paymentRoutes.js
+│   │   └── qrRoutes.js
+│   │
+│   ├── utils/
+│   │   ├── generateToken.js              # JWT token helper
+│   │   ├── generateQRCode.js             # QR code generation logic
+│   │   ├── sendEmail.js                  # Email notifications (optional)
+│   │   └── logger.js                     # For server logging
+│   │
+│   ├── server.js                         # Entry point
+│   ├── package.json
+│   ├── .env                              # Environment variables (DB_URI, JWT_SECRET, API_KEY, etc.)
+│   └── .gitignore
+│
+│
+├── scripts/                              # Optional Python/Node utilities
+│   ├── generate_qr.py                    # Python QR code script (if used)
+│   └── seed_data.js                      # Script to insert demo data
+│
+├── .gitignore                            # Root gitignore
+├── package.json                          # For shared scripts like `npm run dev`
+├── README.md                             # Project documentation
+└── ecosystem.config.js                   # PM2 deployment config (optional)
