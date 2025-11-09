@@ -1,6 +1,6 @@
 import asynchandler from "express-async-handler";
-import bcrypt, { compare } from "bcryptjs";
-import jwt, { sign } from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 import User from "../models/User.js";
 
@@ -14,16 +14,16 @@ const generateToken = (id) => {
 // Creating user
 // @route POST /api/user/signup
 const signup = asynchandler(async (req, res) => {
-    const {_username, _email, _password} = req.body;
+    const {username, email, password} = req.body;
 
     // Validating user data provided by user to sign up
-    if(!_username || !_email || !_password){
+    if(!username || !email || !password){
         res.status(400);
         throw new Error("Fill all the fields");
     }
 
     // Checking if user already exists or not
-    const userExists = User.findOne({_email,_username});
+    const userExists = await User.findOne({email,username});
     if(userExists){
         res.status(400);
         throw new Error("User already exists ");
@@ -36,18 +36,19 @@ const signup = asynchandler(async (req, res) => {
     
     // Creating user with given username, email and hashed password
     const user = await User.create({
-        username : _username,
-        email    : _email,
+        username,
+        email,
         password : hashedPassword
     });
 
     if(user){
         res.status(201).json({
             _id : user._id,
-            _username : user.username,
-            _email : user.email,
+            username : user.username,
+            email : user.email,
             token : generateToken(user._id)
         });
+        console.log("new user created"+user);
     }
     else{
         res.status(400);
@@ -58,18 +59,23 @@ const signup = asynchandler(async (req, res) => {
 // User login 
 // @ route POST /api/user/login
 const login = asynchandler(async (req,res) => {
-    const {_username, _email, _password} = req.body;
+    const {email, password} = req.body;
+    console.log("Email,password " + email,password);
 
-    const user = await User.findOne({_username, _email});
-    if(user && (await bcrypt.compare(_password,user.password))){
-        res.json({
+    const user = await User.findOne({email});
+    console.log("User found : " + user);
+
+    if(user && (await bcrypt.compare(password,user.password))){
+        console.log("Password matched");
+        res.status(201).json({
             _id : user._id,
-            _username : user.username,
-            _email : user.email,
-            token : generateToken(user.id)
+            username : user.username,
+            email : user.email,
+            token : generateToken(user._id)
         })
     }
     else{
+        console.log("Invalid credentials");
         res.status(400);
         throw new Error("Invalid credentials or password");
     }

@@ -1,13 +1,13 @@
-import Routes from "express"
+import express from "express"
 
 import {signup, login, getUser, updateUser, deleteUser} from "../controllers/userController.js";
 
-import { requireAuth } from "../middleware/authMiddleware";
+import { requireAuth } from "../middleware/authMiddleware.js";
 
-const router = Routes();
+const router = express.Router();
 
-router.post("/signup",requireAuth, signup);
-router.post("/login",requireAuth,login);
+router.post("/signup", signup);
+router.post("/login", login);
 router.get("/:id", requireAuth, getUser);
 router.put("/:id", requireAuth, updateUser);
 router.delete("/:id", requireAuth, deleteUser);

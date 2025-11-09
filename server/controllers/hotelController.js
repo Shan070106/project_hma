@@ -27,4 +27,8 @@ const updateHotel = asyncHandler(async (req,res) => {
     hotel.email = update.email || hotel.email; 
 });
 
-export {getHotel, updateHotel};
+const deleteHotel = asyncHandler( async (req,res) => {
+
+});
+
+export {getHotel, updateHotel,deleteHotel};

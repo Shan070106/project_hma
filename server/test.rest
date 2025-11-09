@@ -1,0 +1,38 @@
+POST http://localhost:5000/api/users/signup
+Content-Type: application/json
+
+{
+  "username": "person1",
+  "email": "person1@example.com",
+  "password": "123456"
+}
+
+###
+
+POST http://localhost:5000/api/users/login
+
+Content-Type: application/json
+
+{
+  "email": "person1@example.com",
+  "password": "123456"
+}
+
+### 3️⃣ Get user profile (protected route)
+GET http://localhost:5000/api/users/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGY0ZTBjMjg5MDgwMzA1MGMwYjMwNyIsImlhdCI6MTc2MjYxMDcwMCwiZXhwIjoxNzYyNjk3MTAwfQ.MxwNIg5m8KT_6RueXLIpJegLLrquJrfEUK1IzwvLLuk
+
+### 4️⃣ Update user details (protected route)
+PUT http://localhost:5000/api/users/update
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGY0ZTBjMjg5MDgwMzA1MGMwYjMwNyIsImlhdCI6MTc2MjYxMDcwMCwiZXhwIjoxNzYyNjk3MTAwfQ.MxwNIg5m8KT_6RueXLIpJegLLrquJrfEUK1IzwvLLuk
+
+{
+  "username": "person1_updated",
+  "email": "person1_updated@example.com",
+  "password": "newpass123"
+}
+
+### 5️⃣ Delete user account (protected route)
+DELETE http://localhost:5000/api/users/delete
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGY0ZTBjMjg5MDgwMzA1MGMwYjMwNyIsImlhdCI6MTc2MjYxMDcwMCwiZXhwIjoxNzYyNjk3MTAwfQ.MxwNIg5m8KT_6RueXLIpJegLLrquJrfEUK1IzwvLLuk
