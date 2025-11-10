@@ -8,25 +8,38 @@ import User from "../models/User.js";
    then when user sends any number of requests it will carry this token
    this token is compared and verified in middleware/authMiddleware.js */
 const generateToken = (id) => {
-    return jwt.sign( {id}, process.env.JWT_SECRET_KEY, {expiresIn : "1d"});
+    return jwt.sign( {id}, process.env.JWT_SECRET, {expiresIn : "1d"});
 }
 
 // Creating user
 // @route POST /api/user/signup
 const signup = asynchandler(async (req, res) => {
+    // Defensive: ensure body is present to avoid destructuring from undefined
+    if (!req.body || Object.keys(req.body).length === 0) {
+        const err = new Error("Request body is missing or empty. Ensure 'Content-Type: application/json' header is set and a valid JSON body is sent.");
+        err.status = 400;
+        throw err;
+    }
+
+    // Helpful debug info while developing
+    console.log("[signup] headers:", req.headers);
+    console.log("[signup] body:", req.body);
+
     const {username, email, password} = req.body;
 
     // Validating user data provided by user to sign up
     if(!username || !email || !password){
-        res.status(400);
-        throw new Error("Fill all the fields");
+        const err = new Error("Fill all the fields");
+        err.status = 400;
+        throw err;
     }
 
-    // Checking if user already exists or not
-    const userExists = await User.findOne({email,username});
+    // Checking if user already exists or not (either email OR username)
+    const userExists = await User.findOne({ $or: [{ email }, { username }] });
     if(userExists){
-        res.status(400);
-        throw new Error("User already exists ");
+        const err = new Error("User already exists");
+        err.status = 400;
+        throw err;
     }
 
     // Hashing the password before storing it in database 
@@ -51,23 +64,33 @@ const signup = asynchandler(async (req, res) => {
         console.log("new user created"+user);
     }
     else{
-        res.status(400);
-        throw new Error("Userdata is not valid or user creation failed");
+        const err = new Error("Userdata is not valid or user creation failed");
+        err.status = 400;
+        throw err;
     }
 });
 
 // User login 
 // @ route POST /api/user/login
 const login = asynchandler(async (req,res) => {
+    // Defensive: ensure body is present
+    if (!req.body || Object.keys(req.body).length === 0) {
+        const err = new Error("Request body is missing or empty. Ensure 'Content-Type: application/json' header is set and a valid JSON body is sent.");
+        err.status = 400;
+        throw err;
+    }
+
+    console.log("[login] headers:", req.headers);
+    console.log("[login] body:", req.body);
+
     const {email, password} = req.body;
-    console.log("Email,password " + email,password);
 
     const user = await User.findOne({email});
     console.log("User found : " + user);
 
     if(user && (await bcrypt.compare(password,user.password))){
         console.log("Password matched");
-        res.status(201).json({
+        res.status(200).json({
             _id : user._id,
             username : user.username,
             email : user.email,
@@ -76,13 +99,14 @@ const login = asynchandler(async (req,res) => {
     }
     else{
         console.log("Invalid credentials");
-        res.status(400);
-        throw new Error("Invalid credentials or password");
+        const err = new Error("Invalid credentials or password");
+        err.status = 400;
+        throw err;
     }
 });
 
 // Reading user details
-// @ route GET/api/user/:id 
+// @ route GET /api/user/me 
 const getUser = asynchandler(async (req,res) => {
     const user = await User.findById(req.user.id).select("-password");
 
@@ -90,8 +114,9 @@ const getUser = asynchandler(async (req,res) => {
         res.json(user);
     }
     else{
-        res.status(404);
-        throw new Error("User not foudn or retrieval failed");
+        const err = new Error("User not found or retrieval failed");
+        err.status = 404;
+        throw err;
     }
 });
 
@@ -99,9 +124,9 @@ const getUser = asynchandler(async (req,res) => {
 
 const updateUser = asynchandler(async (req,res) => {
     /* data to be updated only extracted otherwise it will be 'undefined' */
-    const {new_username, new_email, new_password } = req.body;
+    const {username, email, password } = req.body;
 
-    const user = await User.findById(req.body.id);
+    const user = await User.findById(req.user.id);
 
     if(user){
 
@@ -109,26 +134,27 @@ const updateUser = asynchandler(async (req,res) => {
         /* new data come through request, so we extracting data from requests
            data to be updated only be in requests */
 
-        user.username = new_username || user.username;
-        user.email = new_email || user.email;
-        if(new_password){
+        user.username = username || user.username;
+        user.email = email || user.email;
+        if(password){
             const uppu = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(new_password, uppu);
+            user.password = await bcrypt.hash(password, uppu);
         }
 
         const updatedUser = await user.save();
 
         res.json({
             _id       : updatedUser._id,
-            _username : updatedUser.username,
-            _email    : updatedUser.email,
+            username : updatedUser.username,
+            email    : updatedUser.email,
             token     : generateToken(updatedUser._id)
         });
 
     }
     else{
-        res.status(404);
-        throw new Error("User not found or updation failed");
+        const err = new Error("User not found or updation failed");
+        err.status = 404;
+        throw err;
     }
 });
 
@@ -138,12 +164,13 @@ const deleteUser = asynchandler(async (req,res) => {
     const user = await User.findById(req.user.id);
 
     if(user){
-        await user.deleteOne(user.id);
-        res.json({"User deleted successfully" : true});
+        await user.deleteOne();
+        res.json({ message: "User deleted successfully" });
     }
     else{
-        res.status(404);
-        throw new Error("Invalid user to delete or deletion failed");
+        const err = new Error("Invalid user to delete or deletion failed");
+        err.status = 404;
+        throw err;
     }
 });
 
