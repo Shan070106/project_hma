@@ -31,4 +31,8 @@ const deleteHotel = asyncHandler( async (req,res) => {
 
 });
 
-export {getHotel, updateHotel,deleteHotel};
+const createHotel = asyncHandler(async (req,res) => {
+
+});
+
+export {createHotel, getHotel, updateHotel, deleteHotel};

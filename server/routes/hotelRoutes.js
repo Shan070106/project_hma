@@ -1,16 +1,17 @@
 import Router from "express";
 
 // Import controller functions
-import { getHotel, updateHotel, deleteHotel } from "../controllers/hotelController.js";
+import { createHotel, getHotel, updateHotel, deleteHotel } from "../controllers/hotelController.js";
 
 // Import authentication middleware
 import { requireAuth } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get("/:id",requireAuth, getHotel);
-router.put("/:id",requireAuth,updateHotel);
-router.delete("/:id",requireAuth,deleteHotel);
+router.post("/create",requireAuth, createHotel);
+router.get("/me",requireAuth, getHotel);
+router.put("/me",requireAuth,updateHotel);
+router.delete("/me",requireAuth,deleteHotel);
 
 export default router;
 
