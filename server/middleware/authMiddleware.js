@@ -1,15 +1,20 @@
 import jwt from "jsonwebtoken";
 
-export const requireAuth = (req, _res, next) => {
+export const requireAuth = (req, res, next) => {
   try {
     const auth = req.headers.authorization || "";
     const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
-    if (!token) return next({ status: 401, message: "No token" });
+
+    if (!token) {
+      return res.status(401).json({ success: false, message: "No token" });
+    }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = payload.id;
+
+    req.user = { id: payload.id };
+
     next();
   } catch (err) {
-    next({ status: 401, message: "Invalid token" });
+    return res.status(401).json({ success: false, message: "Invalid token" });
   }
 };
