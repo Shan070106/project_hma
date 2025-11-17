@@ -1,19 +1,3 @@
-// Middleware
-// app.use(cors({ origin: true, credentials: true }));
-
-// // Global Error Handler
-// app.use((err, _req, res, _next) => {
-//   const status = err.status || 500;
-//   res.status(status).json({
-//     success: false,
-//     message: err.message || "Internal Server Error",
-//   });
-// });
-
-// Start Server
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
 
 import express from "express";
 import cors from "cors";

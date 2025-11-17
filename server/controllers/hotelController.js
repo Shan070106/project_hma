@@ -1,4 +1,5 @@
 // Importing Hotel model
+import User from "../models/User.js";
 import Hotel from "../models/User.js";
 import asyncHandler from "express-async-handler";
 /* asyncHandler is used to handle exceptions in async functions 
@@ -32,7 +33,35 @@ const deleteHotel = asyncHandler( async (req,res) => {
 });
 
 const createHotel = asyncHandler(async (req,res) => {
+    const userId = req.user.id;
+    
+    const hotelExists = await Hotel.findOne({owner: userId});
+    if(hotelExists){
+        const err = res.status(400).json({message: "User already exists"});
+        throw err;
+    }
+    
+    const {hotelname, address,rating, description, menu, owner} = req.body; 
 
+    if(!owner || !hotelname || !address){
+        res.status(400);
+        throw Error("GIve valid data");
+    }
+
+    const hotel = await Hotel.create({
+        hotelname,
+        address,
+        rating,
+        description,
+        menu,
+        user : owner
+    });
+
+    res.status(201).json({
+        message: "Hotel createed successfully",
+        hotel
+    });
+    
 });
 
 export {createHotel, getHotel, updateHotel, deleteHotel};
