@@ -29,7 +29,20 @@ const updateHotel = asyncHandler(async (req,res) => {
 });
 
 const deleteHotel = asyncHandler( async (req,res) => {
+    const userId = req.user.id;
+    if(!userId){
+        res.status(401);
+        throw new Error("Not authenticated");
+    }
 
+    const hotel = await Hotel.findOne({owner: userId});
+    if(!hotel){
+        res.status(404);
+        throw new Error("Hotel not found");
+    }
+
+    await hotel.remove();
+    res.status(200).json({message: "Hotel deleted successfully"});
 });
 
 const createHotel = asyncHandler(async (req,res) => {
