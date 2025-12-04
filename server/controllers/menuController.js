@@ -54,7 +54,26 @@ const getMenu = asyncHandler(async (req,res) => {
 });
 
 const updateMenu = asyncHandler(async (req, res) => {
-
+    const userId = req.userId;
+    const hotel = await Hotel.findOne({user: userId});
+    if(!hotel){
+        res.status(404);
+        throw new Error("Hotel not found");
+    }
+    const menuId = req.params.menuId;
+    const menu = await Menu.findOne({id: menuId, hotel: hotel.id});
+    if(!menu){
+        res.status(404);
+        throw new Error("Menu item not found");
+    }
+    
+    const { name, description, amount, rating, image, recipe } = req.body || {};
+    if(name) menu.name = name;
+    if(description) menu.description = description;
+    if(amount) menu.amount = amount;
+    if(rating) menu.rating = rating;
+    if(image) menu.image = image;
+    if(recipe) menu.recipe = recipe;
 });
 
 const deleteMenu = asyncHandler(async (req,res) => {
