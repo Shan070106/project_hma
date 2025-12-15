@@ -31,7 +31,16 @@ const createMenu = asyncHandler(async (req,res) => {
 });
 
 const getMenuList = asyncHandler( async (req,res) => {
+    const userId = req.userId;
     
+    const hotel = await Hotel.findOne({user: userId});
+    if(!hotel){
+        res.status(404);
+        throw new Error("Hotel not found");
+    }
+
+    const menuList = await Menu.find({hotel: hotel.id});
+    res.status(200).json({message: "Menu list for the hotel", menuList});
 });
 
 const getMenu = asyncHandler(async (req,res) => {
