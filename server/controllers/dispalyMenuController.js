@@ -8,8 +8,23 @@ const displayMenu = asyncHandler( async (req,res) => {
         res.status(400);
         throw new Error("Hotel Id is not provided");
     }
+
+    const hotel = await Hotel.findById(hotelId);
+    if(!hotel){
+        res.status(404);
+        throw new Error("Hotel not found");
+    }
+
     const menuList = await Menu.find({hotel:hotelId});
-    res.status(200).json({message:"Menu list from the hotel",menuList});
+    
+    res.status(200).json({
+        success: true,
+        message:"Menu list from the hotel",
+        hotel: {
+            id: hotel._id,
+            hotelname: hotel.hotelname
+        },
+        menuList});
 });
 
 export { displayMenu };
