@@ -1,6 +1,7 @@
 import Router from 'express';
 import { createMenu, getMenuList, getMenu, updateMenu, deleteMenu } from '../controllers/menuController.js';
 import { requireAuth } from '../middleware/authMiddleware';
+import { displayMenu } from '../controllers/dispalyMenuController.js';
 
 const router = Router();
 
@@ -9,6 +10,7 @@ router.get('/list',requireAuth, getMenuList);
 router.get('/:id',requireAuth,getMenu);
 router.put('/:id',requireAuth, updateMenu);
 router.delete('/:id',requireAuth, deleteMenu);
+router.get('/hotel/:hotelId',displayMenu);
 
 export default router;
 
