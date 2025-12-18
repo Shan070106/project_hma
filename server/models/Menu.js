@@ -9,6 +9,7 @@ const menuSchema = new mongoose.Schema(
         rating: {type: Number, required: false, default: 0, min: 0, max: 5},
         image: {type: String, required: false},
         recipe: {type: String, required: false, trim: true},
+        avail: {type: Boolean, required: true,default: true}
     },
     {
         timestamps: true
