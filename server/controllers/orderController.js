@@ -1,7 +1,9 @@
 import asyncHandler from "express-async-handler";
 import Order from "../models/Order.js";
 import Menu from "../models/Menu.js";
+import Hotel from "../models/Hotel.js";
 
+// order controllers for public customers without authentication
 const createOrder = asyncHandler(async(req,res) => {
 
     const hotelId = req.params.hotelId;
@@ -62,4 +64,49 @@ const createOrder = asyncHandler(async(req,res) => {
     
 });
 
-export default {createOrder};
+
+
+const customerOrders = asyncHandler(async(req,res) => {
+    const hotelId = req.params.hotelId;
+    if(!hotelId){
+        res.status(400);
+        throw new Error("hotel id not found");
+    }
+
+    const hotel = await Hotel.findById(hotelId);
+    if(!hotel){
+        res.status(404);
+        throw new Error("hotel not found");
+    }
+
+    const sessionId = req.query.sessionId;
+    if(!sessionId){
+        res.status(400);
+        throw new Error("Session Id is required");
+    }
+
+    const orders = await Order.find({
+        hotel: hotelId,
+        sessionId,
+        status: {$ne: "completed"},
+        expires: {$gt: new Date()}
+    }).sort({createdAt: -1});
+
+    if(orders.length === 0){
+        res.status(404);
+        throw new Error("Customer ordered menu items not found");
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Customer ordered food items",
+        hotel: {
+            id: hotel._id,
+            hotelname: hotel.hotelname
+        },
+        orders
+    });
+});
+
+
+export default {createOrder,customerOrders};
