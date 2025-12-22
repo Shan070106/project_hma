@@ -28,10 +28,11 @@ app.use(express.json());
 app.use(morgs("dev"));
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/hotel", hotelRoutes);
+app.use("/api/auth/", authRoutes);
+app.use("/api/hotel/", hotelRoutes);
 app.use("/api/users/", userRoutes);
 app.use("/api/menu/", menuRoutes);
+app.use("/api/order/",orderRoutes);
 
 // Database connection
 dbConnection();
