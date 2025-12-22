@@ -16,7 +16,7 @@ const createOrder = asyncHandler(async(req,res) => {
 
     const orders = req.body;
     console.log(orders);
-    if(!Array.isArray(orders) || orders.length === 0){
+    if(!Array.isArray(orders) || orders.length == 0){
         res.status(400);
         throw new Error("ordered menus must be a non-empty array");
     }
@@ -64,7 +64,43 @@ const createOrder = asyncHandler(async(req,res) => {
     
 });
 
+const getCustomerOrder = asyncHandler(async(req,res) => {
+    const hotelId = req.params.hotelId;
+    if(!hotelId){
+        res.status(400);
+        throw new Error("Hotel Id not found");
+    }
 
+    const {session, table} = req.query;
+    if(!session || !table){
+        res.status(400);
+        throw new Error("Session ID and table id not found");
+    }
+
+    const order = await Order.find({
+        hotel: hotelId,
+        sessionId: session,
+        tableId: table,
+        status: {$in: ["pending", "confirmed"]},
+        expires: {$gt: new Date()}
+    })
+    .sort({createdAt: -1}).populate("menuItems.menuItem","name price");
+    
+    if(order.length === 0){
+        res.status(404);
+        throw new Error("Orders not found");
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Customer orders",
+        hotel: {
+            id: hotelId,
+            hotelname: hotel.hotelname
+        },
+        order
+    });
+});
 
 const customerOrders = asyncHandler(async(req,res) => {
     const hotelId = req.params.hotelId;
@@ -109,4 +145,7 @@ const customerOrders = asyncHandler(async(req,res) => {
 });
 
 
-export default {createOrder,customerOrders};
+
+export default {createOrder,customerOrders,getCustomerOrder};
+
+
