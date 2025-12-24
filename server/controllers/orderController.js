@@ -64,6 +64,35 @@ const createOrder = asyncHandler(async(req,res) => {
     
 });
 
+const cancelCustomer = asyncHandler(async(req,res) => {
+    const {hotelId,sessionId,tableId} = req.body;
+    if(!hotelId || !sessionId || !tableId){
+        res.status(400);
+        throw new Error("Invalid request, hotel session table ids required");
+    }
+
+    const order = await Order.findOne({
+        hotel: hotelId,
+        sessionId,
+        tableId,
+        status: "pending",
+        expires: {$gt: new Date()}
+    });
+
+    if(!order){
+        res.status(404);
+        throw new Error("active order not found");
+    }
+
+    order.status = "cancelled";
+    await order.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Entire order cancelled successfully"
+    });
+});
+
 const getCustomerOrder = asyncHandler(async(req,res) => {
     const hotelId = req.params.hotelId;
     if(!hotelId){
@@ -146,6 +175,6 @@ const customerOrders = asyncHandler(async(req,res) => {
 
 
 
-export default {createOrder,customerOrders,getCustomerOrder};
+export default {createOrder,customerOrders,getCustomerOrder,cancelCustomer};
 
 
