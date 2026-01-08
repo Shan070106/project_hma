@@ -1,31 +1,29 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import AuthProvider from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import AdminLayout from './layouts/AdminLayout';
+import LandingPage from './pages/public/LandingPage';
+import AuthPage from './pages/public/AuthPage';
+import PublicLayout from './layouts/PublicLayout';
 
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import AdminDashboard from "./components/admin/AdminDashboard";
-
-export default function App() {
+function App(){
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
 
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+
+        {/* Public */}
+        <Route element = {<PublicLayout />}>
+          <Route index element = {<LandingPage />} />
+          <Route path='/auth' element = {<AuthPage />}/>
+        </Route>
+
+        {/* Admin */}       
+        <Route element = {<AdminLayout />}>
+        </Route>
+
+
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    </BrowserRouter>
   );
 }
+
+export default App;
