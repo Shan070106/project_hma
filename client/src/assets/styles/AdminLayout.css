@@ -1,0 +1,22 @@
+.admin-layout{
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-header{
+    border-bottom: 3px solid #1637f3;
+}
+
+.admin-body{
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+}
+
+.sidebar{
+    border-right: 3px solid #1637f3;
+}
+
+.main{
+    flex-grow: 1;
+}
