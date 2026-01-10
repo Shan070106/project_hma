@@ -1,0 +1,47 @@
+
+
+
+.Auth{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    width: 100vw;
+    align-content: space-around;
+    
+}
+
+nav{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    bottom: 100px;
+}
+
+.rules{
+    width: 400px;
+    height: 600px;
+    display : flex;
+    flex-direction : column;
+    border: 2px solid rgb(61, 61, 61);
+    border-radius: 8px;
+    position: relative;
+    margin: auto;
+    padding : 10px;
+    overflow: auto;
+    scrollbar-width: thin;
+}
+
+.home-btn{
+    width: 100px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: rgb(47, 47, 223);
+    color: white;
+    border: none;
+    align-items: center;
+    /* padding: 10px */
+}

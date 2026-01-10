@@ -1,0 +1,52 @@
+
+.Signup{
+    width: 400px;
+    height: 600px;
+    display : flex;
+    flex-direction : column;
+    border: 2px solid rgb(61, 61, 61);
+    border-radius: 8px;
+    position: relative;
+    margin: auto;
+    padding : 10px;
+    align-content: space-around;
+} 
+
+.Signup h2{
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.signup-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    gap : 10px;
+}
+
+.signup-row{
+    display: flex;
+    flex-direction: column;
+    gap : 10px;
+    margin-bottom : 20px;
+}
+
+input[type="text"], input[type="email"], input[type="password"]{
+    width: 250px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button{
+    width: 100px;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    
+}
