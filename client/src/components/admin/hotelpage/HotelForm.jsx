@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './HotelForm.css';
 
-function HotelForm({hotel,editable}){
+function HotelForm({hotel,editable,onCancel,onSave}){
     const [hotelForm, setForm] = useState({
         hotelname: "",
         address: "",
@@ -27,26 +27,49 @@ function HotelForm({hotel,editable}){
     
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(hotelForm);
+        // console.log(hotelForm);
+        if(onSave)
+            onSave(hotelForm);
+    }
+
+    const handleReset = () => {
+        setForm({
+            hotelname : hotel?.hotelname || "",
+            address: hotel?.address || "",
+            contact: hotel?.contact || "",
+            rating: hotel?.rating || ""
+        });
     }
 
     return (
         <div className='form'>
            
             <form className="hotel-info" onSubmit={handleSubmit}>
-                {Object.entries(hotelForm).map(([key,value]) => (
-                    <div key={key} className='hotel-row'>
-                        <label htmlFor={key}>{key}</label>
-                        <input 
-                        key={key}
-                        name={key}
-                        value={value} 
-                        onChange={handleChange}
-                        readOnly={!editable}/>
-                    </div>
-                ))}                
-                <button type="submit" disabled={!editable} >Save&Continue</button>
+                {
+                    Object.entries(hotelForm).map(([key,value]) => (
+                        <div key={key} className='hotel-row'>
+                            <label htmlFor={key}>{key.replace(/^\w/, c => c.toUpperCase())}</label> 
+                            <input 
+                            key={key}
+                            name={key}
+                            value={value} 
+                            onChange={handleChange}
+                            readOnly={!editable}/>
+                        </div>
+                    ))
+                }                
+
+                {
+                    ( editable &&
+                        <div>
+                            <button type="submit"> Save </button>
+                            <button onClick={handleReset}> Reset </button>                          
+                            <button onClick={onCancel}> Cancel </button>
+                        </div>
+                    )
+                }
             </form>
+
         </div>
     );
 }

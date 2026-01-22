@@ -5,19 +5,28 @@ import '../../assets/styles/HotelPage.css';
 
 function HotelPage(){
     const [edit, setEdit] = useState(false);
-    // const hotel = {
-    //     hotelname: "annapoorna",
-    //     address: "Coimbatore",
-    //     contact: "989669",
-    //     rating: '5'
-    // };
+    const hotel = {
+        hotelname: "annapoorna",
+        address: "Coimbatore",
+        contact: "989669",
+        rating: '5'
+    };
     // fetch hotel later
-    const hotel = null;
+    // const hotel = null;
 
     const handleEdit = () => {
         if(hotel){
             setEdit(true);
         }
+    }
+
+    const handleCancel = () => {
+        setEdit(false);
+    }
+
+    const handleSave = (hotelData) => {
+        console.log(hotelData);
+        setEdit(false);
     }
 
     return (
@@ -36,7 +45,7 @@ function HotelPage(){
         {
             hotel? (
                 edit? (
-                    <HotelForm hotel={hotel} editable={edit}/>
+                    <HotelForm hotel={hotel} editable={edit} onCancel={handleCancel} onSave={handleSave}/>
                 ): (
                     <ViewHotel hotel = {hotel}/>
                 )
