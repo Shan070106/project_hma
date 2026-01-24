@@ -1,7 +1,7 @@
 .sidenav{
     width: 200px;
     height: 100vh;
-    background-color: #afa9a9;
+    background-color: #5762f0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -12,5 +12,5 @@
 }
 
 .side-menu{
-    color: rgb(126, 19, 19)
+    color: rgb(241, 235, 235)
 }

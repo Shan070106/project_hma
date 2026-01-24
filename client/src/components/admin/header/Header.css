@@ -1,6 +1,7 @@
 .headnav{
-    background-color: #6285a8;
+    background-color: #187bdf;
     display: flex;
     flex-direction: row;
     padding: 5px;
+    color: white
 }
