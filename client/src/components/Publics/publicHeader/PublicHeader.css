@@ -1,0 +1,26 @@
+.nav-bar{
+    border-top: 0px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #e6e5e5;
+    border-bottom: blue 4px solid;
+    box-shadow: 0 2px 4px rgba(124, 42, 42, 0.1);
+    /* position: fixed; */
+}
+
+.auth-btn{
+    width: 100px;
+    height: 40px;
+    margin: 30px;
+    justify-content: center;
+    border: blue 4px solid;
+    border-radius: 4px;
+    background-color: white;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+
+}
