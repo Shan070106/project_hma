@@ -40,7 +40,7 @@ input[type="text"], input[type="email"], input[type="password"]{
     border-radius: 4px;
 }
 
-button{
+.submit-btn{
     width: 100px;
     padding: 10px;
     border: none;
