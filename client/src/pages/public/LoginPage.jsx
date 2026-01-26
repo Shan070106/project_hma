@@ -21,7 +21,7 @@ function LoginPage(){
           <input type="password" placeholder="Key to application"/>
         </div>
 
-        <button type="submit">Submit</button>
+        <button className="submit-btn" type="submit">Submit</button>
       </form>
     </div>
   );

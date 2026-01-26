@@ -27,7 +27,7 @@ function SignupPage(){
           <input type="password" placeholder="Finalize Key"/>
         </div>
 
-        <button type="submit">Submit</button>
+        <button className="submit-btn" type="submit">Submit</button>
       </form>
     </div>
   );
