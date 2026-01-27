@@ -1,7 +1,65 @@
-.headnav{
-    background-color: #187bdf;
-    display: flex;
-    flex-direction: row;
-    padding: 5px;
-    color: white
+.headnav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; /* allows wrapping on small screens */
+
+  padding: 8px 16px;
+  background-color: #187bdf;
+  color: #fff;
+}
+
+/* Left and right sections (optional but recommended) */
+.headnav .left,
+.headnav .right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Navigation links / buttons */
+.headnav a,
+.headnav button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Hover feedback */
+.headnav a:hover,
+.headnav button:hover {
+  text-decoration: underline;
+}
+
+/* -------- Tablet & Mobile -------- */
+@media (max-width: 768px) {
+  .headnav {
+    justify-content: center;
+  }
+
+  .headnav .left,
+  .headnav .right {
+    width: 100%;
+    justify-content: center;
+    margin-top: 6px;
+  }
+}
+
+/* -------- Very small screens -------- */
+@media (max-width: 480px) {
+  .headnav {
+    padding: 6px 10px;
+  }
+
+  .headnav a,
+  .headnav button {
+    font-size: 13px;
+  }
 }
