@@ -1,16 +1,71 @@
-.sidenav{
-    width: 200px;
-    height: 100vh;
-    background-color: #5762f0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 20px;
-    gap: 10px;
-    cursor: pointer;
+.sidenav {
+  width: 200px;                /* SAME as before */
+  min-width: 180px;
+  height: 100vh;
+
+  background-color: #5762f0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding-top: 20px;
+  gap: 10px;
+
+  cursor: pointer;
+
+  /* NEW: stability & responsiveness */
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
 }
 
-.side-menu{
-    color: rgb(241, 235, 235)
+/* Sidebar links */
+.side-menu {
+  width: 100%;
+  text-align: center;
+
+  padding: 10px 0;
+  text-decoration: none;
+
+  color: rgb(241, 235, 235);
+  font-size: 15px;
+
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover feedback (safe addition) */
+.side-menu:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Active link support (React Router) */
+.side-menu.active {
+  background-color: rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+}
+
+/* -------- Mobile safe behavior -------- */
+@media (max-width: 768px) {
+  .sidenav {
+    width: 160px;     /* shrinks but still works */
+    min-width: 140px;
+  }
+
+  .side-menu {
+    font-size: 14px;
+  }
+}
+
+/* -------- Very small screens -------- */
+@media (max-width: 480px) {
+  .sidenav {
+    width: 140px;
+  }
+
+  .side-menu {
+    font-size: 13px;
+    padding: 8px 0;
+  }
 }
