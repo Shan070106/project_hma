@@ -2,7 +2,30 @@ import { useEffect, useState } from "react";
 
 import "./MenuForm.css";
 
-function MenuForm({ menu, edit,onEdit,onCancel, onSave, onBack }) {
+function MenuImageInput() {
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSelectedImage(reader.result); // URL for preview
+            };
+            reader.readAsDataURL(file);
+        }
+        return (
+            <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+            />
+        );
+    }
+}
+
+
+function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
     const [menuForm, setForm] = useState({
         name: "",
         description: "",
@@ -22,63 +45,64 @@ function MenuForm({ menu, edit,onEdit,onCancel, onSave, onBack }) {
                 rating: menu.rating || "",
                 image: menu.image || "",
                 recipe: menu.recipe || "",
-                avail: menu.avail?"yes":"no" 
+                avail: menu.avail ? "yes" : "no"
             });
         }
     }, [menu]);
 
-   const handleSubmit = (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
-        if(onSave)
+        if (onSave)
             onSave(menuForm);
     }
 
     const handleChange = (event) => {
-        const {name,value} = event.target;
-        setForm((prev)=>({...prev,[name] : value}));
+        const { name, value } = event.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
     }
 
     const handleReset = () => {
         setForm({
-             name: menu?.name || "",
+            name: menu?.name || "",
             description: menu?.description || "",
             amount: menu?.amount || "",
             rating: menu?.rating || "",
             image: menu?.image || "",
             recipe: menu?.recipe || "",
-            avail: menu?.avail?"yes":"no" 
+            avail: menu?.avail ? "yes" : "no"
         })
     }
 
     return (
         <div className="menu-form">
             <button type="button" onClick={onBack}>{"<-"}</button>
-            {menu?.image && <img src={menu.image} alt="food image" />}
+            {/* {menu?.image && <img src={menu.image} alt="food image" />} */}
+            <MenuImageInput />
             <form className="form" onSubmit={handleSubmit}>
-                 {
-                    Object.entries(menuForm).map(([key,value]) => (
+                {
+                    Object.entries(menuForm).map(([key, value]) => (
                         <div key={key} className='menu-row'>
-                            <label htmlFor={key}>{key.replace(/^\w/, c => c.toUpperCase())}</label> 
-                            <input 
-                            key={key}
-                            name={key}
-                            value={value} 
-                            onChange={handleChange}
-                            readOnly={!edit}/>
+                            <label htmlFor={key}>{key.replace(/^\w/, c => c.toUpperCase())}</label>
+                            <input
+                                key={key}
+                                name={key}
+                                value={value}
+                                onChange={handleChange}
+                                readOnly={!edit} />
                         </div>
                     ))
-                } 
+                }
 
-                 {
-                    ( edit &&
+                {
+                    (edit &&
                         <div>
                             <button type="submit"> Save </button>
-                            <button type="button" onClick={handleReset}> Reset </button>                          
+                            <button type="button" onClick={handleReset}> Reset </button>
                             <button type="button" onClick={onCancel}> Cancel </button>
                         </div>
                     )
                 }
-                { menu && <button type="button" onClick={onEdit}>Edit</button>}
+                {menu && <button type="button" onClick={onEdit}>Edit</button>}
             </form>
         </div>
     );
