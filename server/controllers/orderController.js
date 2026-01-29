@@ -64,7 +64,7 @@ const createOrder = asyncHandler(async(req,res) => {
     
 });
 
-const cancelCustomer = asyncHandler(async(req,res) => {
+const cancelOrder = asyncHandler(async(req,res) => {
     const {hotelId,sessionId,tableId} = req.body;
     if(!hotelId || !sessionId || !tableId){
         res.status(400);
@@ -175,6 +175,6 @@ const customerOrders = asyncHandler(async(req,res) => {
 
 
 
-export default {createOrder,customerOrders,getCustomerOrder,cancelCustomer};
+export default {createOrder,customerOrders,getCustomerOrder,cancelOrder};
 
 
