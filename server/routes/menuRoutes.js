@@ -1,16 +1,34 @@
 import Router from 'express';
+
+import upload from '../middleware/upload.js';
+import requireAuth from '../middleware/authMiddleware.js';
+
+import displayMenu from '../controllers/dispalyMenuController.js';
 import { createMenu, getMenuList, getMenu, updateMenu, deleteMenu } from '../controllers/menuController.js';
-import { requireAuth } from '../middleware/authMiddleware.js';
-import { displayMenu } from '../controllers/dispalyMenuController.js';
 
 const router = Router();
 
-router.post('/create',requireAuth, createMenu);
-router.get('/list',requireAuth, getMenuList);
-router.get('/:id',requireAuth,getMenu);
-router.put('/:id',requireAuth, updateMenu);
-router.delete('/:id',requireAuth, deleteMenu);
-router.get('/hotel/:hotelId',displayMenu);
+router.post(
+   '/create',
+   requireAuth,
+   upload.single("image"),
+   createMenu
+);
+
+router.get('/list', requireAuth, getMenuList);
+
+router.get('/:id', requireAuth, getMenu);
+
+router.put(
+   '/:id',
+   requireAuth,
+   upload.single("image"),
+   updateMenu
+);
+
+router.delete( '/:id', requireAuth, deleteMenu );
+
+router.get('/hotel/:hotelId', displayMenu);
 
 export default router;
 
