@@ -175,6 +175,6 @@ const customerOrders = asyncHandler(async(req,res) => {
 
 
 
-export default {createOrder,customerOrders,getCustomerOrder,cancelOrder};
+export {createOrder,customerOrders,getCustomerOrder,cancelOrder};
 
 
