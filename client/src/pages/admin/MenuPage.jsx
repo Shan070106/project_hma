@@ -27,7 +27,10 @@ function MenuPage() {
     }
 
     const handleSave = (menuData) => {
-        console.log(menuData);
+        menuData.forEach((key,value) => {
+            console.log(key, value);
+        });
+
         setEdit(false);
         // setMode("list");
         // setOpened(null);
@@ -67,7 +70,7 @@ function MenuPage() {
                             {menuList.length === 0 ? (
                                 <p>No menu added yet...!</p>
                             ) : (
-                                <DisplayMenu menus={menuList} open={handleOpen} onBack={()=>setMode("list")}/>
+                                <DisplayMenu menus={menuList} open={handleOpen} />
                             )}
                         </>
                     )
@@ -82,7 +85,7 @@ function MenuPage() {
                         onSave={handleSave}
                         onCancel={handleCancel}
                         onEdit={handleEdit}
-                        onBack={() => setMode("list")}
+                        onBack={onBack}
                     />
                 }
             </main>
