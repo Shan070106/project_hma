@@ -1,27 +1,20 @@
 import { useEffect, useState } from "react";
 
+import noImage from "../../../assets/images/no-image.jpg";
 import "./MenuForm.css";
 
-function MenuImageInput() {
-    const [selectedImage, setSelectedImage] = useState(null);
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setSelectedImage(reader.result); // URL for preview
-            };
-            reader.readAsDataURL(file);
-        }
-        return (
-            <input
+function MenuImageInput({ perviewUrl, onImageClick }) {
+    return (
+        <div className="image-input">
+            {perviewUrl && <img src={perviewUrl || noImage} alt="Dish image" /> }
+           { 
+           <input
                 type="file"
                 accept="image/*"
-                onChange={handleImageChange}
-            />
-        );
-    }
+                onChange={onImageClick}
+            />}
+        </div>
+    );
 }
 
 
@@ -31,10 +24,11 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
         description: "",
         amount: "",
         rating: "",
-        image: "",
         recipe: "",
         avail: ""
     });
+
+    const [menuImageFile, setImageFile] = useState(null);
 
     useEffect(() => {
         if (menu) {
@@ -43,17 +37,31 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
                 description: menu.description || "",
                 amount: menu.amount || "",
                 rating: menu.rating || "",
-                image: menu.image || "",
                 recipe: menu.recipe || "",
                 avail: menu.avail ? "yes" : "no"
             });
+            
+            if (menu.image?.url) {
+                setImageFile(menu.image.url);
+            }
         }
+
     }, [menu]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
+
+        const menuData = new FormData();
+
+        Object.entries(menuForm).forEach(([key, value]) => {
+            menuData.append(key, value);
+        });
+
+        if (menuImageFile)
+            menuData.append("image",menuImageFile);
+
         if (onSave)
-            onSave(menuForm);
+            onSave(menuData);
     }
 
     const handleChange = (event) => {
@@ -67,17 +75,35 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
             description: menu?.description || "",
             amount: menu?.amount || "",
             rating: menu?.rating || "",
-            image: menu?.image || "",
             recipe: menu?.recipe || "",
             avail: menu?.avail ? "yes" : "no"
-        })
+        });
+
+        if (menuImageFile) {
+            setImageFile(menu.image?.url || noImage);
+        }
     }
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageFile(reader.result); // URL for preview
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
+    <>
+        <button type="button" onClick={onBack}>{"<- back"}</button>
+            
         <div className="menu-form">
-            <button type="button" onClick={onBack}>{"<-"}</button>
-            {/* {menu?.image && <img src={menu.image} alt="food image" />} */}
-            <MenuImageInput />
+            <MenuImageInput
+                perviewUrl={menuImageFile || noImage}
+                onImageClick={handleImageChange}
+                />
             <form className="form" onSubmit={handleSubmit}>
                 {
                     Object.entries(menuForm).map(([key, value]) => (
@@ -105,6 +131,7 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
                 {menu && <button type="button" onClick={onEdit}>Edit</button>}
             </form>
         </div>
+        </>
     );
 }
 
