@@ -1,0 +1,88 @@
+/* .hotel-page{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+header{
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #000000;
+}
+
+header h2{
+    margin-left: 5px;
+}
+
+.btns{
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    margin-left: 5px;
+}
+
+.view{
+    display: flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+} */
+
+.hotelpage {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Header */
+.hotelpage header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.hotelpage header h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.hotelpage header p {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Edit button container */
+.hotelpage .btns {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+/* Buttons */
+.hotelpage button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.hotelpage button:hover {
+  background-color: #0056b3;
+}
+
+/* Card-style container for form/view */
+.hotelpage > div:last-child {
+  background-color: #fafafa;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
