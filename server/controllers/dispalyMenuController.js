@@ -27,4 +27,4 @@ const displayMenu = asyncHandler( async (req,res) => {
         menuList});
 });
 
-export { displayMenu };
+export default displayMenu ;
