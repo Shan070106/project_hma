@@ -1,8 +1,8 @@
 import './DisplayMenu.css';
 
-function MenuBox({menu,open}) {
+function MenuBox({menuId,menu,open}) {
     return (
-        <tr>
+        <tr key={menuId}>
             <td className="td">
                 {menu?.image && <img src={menu.image?.url} alt="Dish image" />}
             </td>
@@ -18,9 +18,10 @@ function MenuBox({menu,open}) {
 
 
 function DisplayMenu({ menus,open }) {
+    console.log(menus.map((m)=>m._id))
     const MenuList = menus.map(menuItem => {
         return < MenuBox 
-            key={menuItem.id || menuItem.name}
+            key={menuItem._id}
             menu={menuItem}
             open={open}
         />
