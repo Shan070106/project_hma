@@ -9,9 +9,10 @@ function MenuPage() {
     const [mode, setMode] = useState("list"); // mode : list | form 
     const [opened, setOpened] = useState(null);
     const [editable, setEdit] = useState(false);
+    const [menuItems,setMenuItem] = useState(MenuSample);
 
     // menuList fectched from server side later...
-    const menuList = MenuSample;
+    // const menuList = menuItems;
     // const menuList = [];
 
     const handleAdd = () => {
@@ -32,6 +33,7 @@ function MenuPage() {
         });
 
         setEdit(false);
+        setMenuItem(prevMenuItems => [...prevMenuItems,menuData]);
         // setMode("list");
         // setOpened(null);
     }
@@ -67,10 +69,10 @@ function MenuPage() {
                         <>
                             <button onClick={handleAdd}>ADD</button>
 
-                            {menuList.length === 0 ? (
+                            {menuItems.length === 0 ? (
                                 <p>No menu added yet...!</p>
                             ) : (
-                                <DisplayMenu menus={menuList} open={handleOpen} />
+                                <DisplayMenu menus={menuItems} open={handleOpen} />
                             )}
                         </>
                     )
