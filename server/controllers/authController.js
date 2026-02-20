@@ -5,20 +5,18 @@ import signinToken from "../utils/generateToken.js";
 
 import User from "../models/User.js";
 
-const signup = asynchandler(async (res,req) => {
+const signup = asynchandler(async (req,res) => {
 
     if(!req.body || Object.keys(req.body).length === 0){
-        return res.status(400).json({
-          message: "Request body is missing, Ensure Content-Type: application/json is set."
-        });    
+        res.status(400);
+        throw new Error("Request body is missing, Ensure Content-Type: application/json is set.");
     }
 
     const {username,email,password} = req.body;
     
     if(!username || !email || !password){
-      return res.status(400).json({
-        message: "All fields are required"
-      });
+      res.status(400);
+      throw new Error("All fields are required");
     }
 
     const userExists = await User.findOne({
@@ -26,9 +24,8 @@ const signup = asynchandler(async (res,req) => {
     });
     
     if(userExists){
-        return res.status(400).json({
-          message: "User already exists, try to give different username or email"
-        });
+        res.status(400);
+        throw new Error("User already exists, try to give different username or email");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -53,32 +50,28 @@ const signup = asynchandler(async (res,req) => {
 const login = asynchandler( async (req,res) => {
    
   if(!req.body || Object.keys(req.body).length === 0){
-      return res.status(400).json({
-        message: "Request body is missing, Ensure Content-Type: application/json is set"        
-      });
+      res.status(400);
+      throw new Error("Request body is missing, Ensure Content-Type: application/json is set");
    }
 
    const {username, password} =  req.body;
 
    if(!username || !password){
-    return res.status(400).json({
-      message: "Both fields are required"
-    });
+    res.status(400);
+    throw new Error("Both fields are required");
    }
 
    const user = await User.findOne({username});
    if(!user){
-      return res.status(404).json({
-        message: "Username not found"
-      });
+      res.status(404);
+      throw new Error("Username not found");
    }
 
    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if(!passwordMatch){
-      return res.status(401).json({
-        message: "Wrong password"
-      });
+      res.status(401);
+      throw new Error("Wrong password");
    }
    
   return res.status(200).json({
