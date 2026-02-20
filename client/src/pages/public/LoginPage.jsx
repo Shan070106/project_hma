@@ -35,10 +35,34 @@ function LoginPage(){
     });
   }
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    try {
+      
+      const {data} = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        user
+      ); 
+
+      handleSuccess(data.message);
+
+      setTimeout(() => {
+        navigateTo('/admin');
+      }, 1000);
+
+    } catch (error) {
+      const errorMsg = error?.response?.data?.message || "Server error" ;
+
+      handleError(errorMsg);
+      console.log(error);     
+    }
+  }
+
   return (
     <div className="Login">
       <h2>Login</h2>
-      <form className="login-form">
+      <form className="login-form" onSubmit={handleSubmit}>
         
          <div className="login-row">
           <label htmlFor="name"><b>Username</b></label> 
@@ -68,6 +92,9 @@ function LoginPage(){
 
         <button className="submit-btn" type="submit">Submit</button>
       </form>
+
+      <ToastContainer/>
+
     </div>
   );
 }
