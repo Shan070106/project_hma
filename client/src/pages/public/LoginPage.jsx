@@ -40,12 +40,15 @@ function LoginPage(){
 
     try {
       
-      const {data} = await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/api/auth/login",
         user
       ); 
 
-      handleSuccess(data.message);
+      const token = response?.data?.tokenId;
+      localStorage.setItem("token",token);
+
+      handleSuccess(response?.data?.message);
 
       setTimeout(() => {
         navigateTo('/admin');

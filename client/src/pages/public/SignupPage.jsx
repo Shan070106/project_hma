@@ -46,14 +46,17 @@ function SignupPage(){
     console.log("Form is submitted");
     try {
         const {confirmPassword, ...userData} = user; 
-        const {data} = await axios.post(
+        const response = await axios.post(
           'http://localhost:5000/api/auth/signup',
           userData
           // ,
           // { withCredentials: true }
         );
         
-        handleSuccess(data.message);
+        handleSuccess(response.data.message);
+
+        const token = response.data.tokenId;
+        localStorage.setItem("token",token);
 
         setTimeout(() => {
           navigateTo("/admin")
