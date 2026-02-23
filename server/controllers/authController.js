@@ -37,6 +37,7 @@ const signup = asynchandler(async (req,res) => {
     });
 
     return res.status(201).json({
+      message: "Signup Successful",
       user: {
         id: user._id,
         username: user.username,
@@ -75,6 +76,7 @@ const login = asynchandler( async (req,res) => {
    }
    
   return res.status(200).json({
+    message: "Login successful",
     user: {
       id: user._id,
       email: user.email,
