@@ -8,26 +8,31 @@ import asyncHandler from "express-async-handler";
 /* asynchandler repalces the try/catch block */
 
 // Get the authenticated user's hotel (route: GET /me)
-const getHotel = asyncHandler(async (req, res) => {
-    const userId = req.userId;
+const retrieveHotel = asyncHandler(async (req, res) => {
+    console.log("Retrieved hotel: ", req);
+    const userId = req.user.id;
 
     if (!userId) {
-        res.status(401);
-        throw new Error("Not authenticated");
+        const err = new Error("Not not authenticated");
+        err.status = 401;
+        throw err;
     }
 
     const hotel = await Hotel.findOne({ user: userId });
     if (!hotel) {
-        res.status(404);
-        throw new Error("Hotel not found");
+        const err = new Error("Hotel not found");
+        err.status = 404;
+        throw err;
     }
 
-    res.status(200).json(hotel);
+    const err = new Error(JSON.stringify(hotel));
+    err.status = 200;
+    throw err;
 });
 
 // Update the authenticated user's hotel (route: PUT /me)
 const updateHotel = asyncHandler(async (req, res) => {
-    const userId = req.userId;
+    const userId = req.user.id;
 
     if (!userId) {
         res.status(401);
@@ -53,12 +58,13 @@ const updateHotel = asyncHandler(async (req, res) => {
     if (update.menu) hotel.menu = update.menu;
 
     const updatedHotel = await hotel.save();
-    res.status(200).json(updatedHotel);
+    res.status(200);
+    throw new Error(JSON.stringify(updatedHotel));
 });
 
 // Delete the authenticated user's hotel (route: DELETE /me)
 const deleteHotel = asyncHandler(async (req, res) => {
-   const userId = req.userId;
+   const userId = req.user.id;
 
     if (!userId) {
         res.status(401);
@@ -77,16 +83,18 @@ const deleteHotel = asyncHandler(async (req, res) => {
     }
 
     await hotel.deleteOne();
-    res.status(200).json({ message: "Hotel deleted successfully" });
+    res.status(200);
+    throw new Error(JSON.stringify({ message: "Hotel deleted successfully" }));
 });
 
 // Create a hotel for the authenticated user (route: POST /create)
 const createHotel = asyncHandler(async (req, res) => {
-    const userId = req.userId;
+    console.log("REqext: ", req);
+    const userId = req.user.id;
 
     if (!userId) {
         res.status(401);
-        throw new Error("Not authenticated");
+        throw new Error("Not noauthenticated");
     }
 
     const hotelExists = await Hotel.findOne({ user: userId });
@@ -110,7 +118,8 @@ const createHotel = asyncHandler(async (req, res) => {
         user: userId,
     });
 
-    res.status(201).json({ message: "Hotel created successfully", hotel });
+    res.status(201);
+    throw new Error(JSON.stringify({ message: "Hotel created successfully", hotel }));
 });
 
-export { createHotel, getHotel, updateHotel, deleteHotel };
+export { createHotel, retrieveHotel, updateHotel, deleteHotel };

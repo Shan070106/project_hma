@@ -1,15 +1,15 @@
 import Router from "express";
 
 // Import controller functions
-import { createHotel, getHotel, updateHotel, deleteHotel } from "../controllers/hotelController.js";
+import { createHotel, retrieveHotel, updateHotel, deleteHotel } from "../controllers/hotelController.js";
 
 // Import authentication middleware
-import { requireAuth } from "../middleware/authMiddleware.js";
+import  requireAuth  from "../middleware/authMiddleware.js";
 
 const router = Router();
 
 router.post("/create",requireAuth, createHotel);
-router.get("/me",requireAuth, getHotel);
+router.get("/me",requireAuth, retrieveHotel);
 router.put("/me",requireAuth,updateHotel);
 router.delete("/me",requireAuth,deleteHotel);
 
