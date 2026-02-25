@@ -1,7 +1,7 @@
 import Menu from "../models/Menu.js";
 import Hotel from "../models/Hotel.js";
 import asyncHandler from "express-async-handler";
-import cloudinary from "cloudinary.js";
+import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
 
 const createMenu = asyncHandler(async (req,res) => {
