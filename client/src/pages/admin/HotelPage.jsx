@@ -7,17 +7,12 @@ import axios from 'axios';
 
 function HotelPage() {
 
-    const [hotel, setHotel] = useState({
-        hotelname: "",
-        address: "",
-        contact: "",
-        rating: ""
-    });
-
+    const [hotel, setHotel] = useState(null);
     const [edit, setEdit] = useState(false);
+    const [loading,setLoading] = useState(true);
 
     useEffect(() => {
-        getHotel();
+        fetchHotel();
     }, []);
 
     const handleEdit = () => {
@@ -39,7 +34,7 @@ function HotelPage() {
         toast.error(errorMessage,{ position: 'top-center' });
     }
 
-    async function getHotel() {
+    async function fetchHotel() {
         try {
             const token = localStorage.getItem("token");
             const response = await axios.get(
@@ -51,20 +46,23 @@ function HotelPage() {
                 }
             );
 
-            const { hotelname, address, rating } = response.data;
-            setHotel({
-                hotelname: hotelname || "",
-                address: address || "",
-                // contact: contact || "",
-                rating: rating || ""
-            });
+            setHotel(response.data);
+
         } catch (error) {
-             const errorMsg = error?.response?.data?.message || "Server error" ;
-             console.log(error);
+            const errorMsg = error?.response?.data?.message || "Server error" ;
+            console.log(error);
             console.log(errorMsg);
-            handleError(errorMsg);
+
+            if(errorMsg === "Hotel not found") setHotel(null);           
+            else handleError(errorMsg);
+            
+        } finally{
+            setLoading(false);
         }
+
     }
+
+    if(loading) return <p>Loading the page</p>;
 
     return (
         <div className='hotelpage'>
@@ -80,14 +78,29 @@ function HotelPage() {
             </div>
 
             {
-                hotel ? (
-                    edit ? (
-                        <HotelForm hotel={hotel} editable={edit} onCancel={handleCancel} onSave={handleSave} />
-                    ) : (
-                        <ViewHotel hotel={hotel} />
-                    )
-                ) : (
-                    <HotelForm hotel={null} editable={true} />
+                hotel && edit && (
+                    <HotelForm 
+                        hotel={hotel} 
+                        editable={edit} 
+                        onCancel={handleCancel} 
+                        onSave={handleSave} 
+                    />
+                )
+            }
+                
+            {
+                hotel && !edit && (
+                    <ViewHotel hotel={hotel} />
+                )
+            }
+                
+            {
+                !hotel && (
+                    <HotelForm 
+                        hotel={hotel} 
+                        editable={true} 
+                        onSave={handleSave}
+                    />
                 )
             }
             <ToastContainer/>
