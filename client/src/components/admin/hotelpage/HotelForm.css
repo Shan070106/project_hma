@@ -1,4 +1,22 @@
- /* Main form container */
+ /* Form sections */
+.form-section {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.form-section h3 {
+  margin: 0 0 15px 0;
+  color: #07396b;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 2px solid #438dd8;
+  padding-bottom: 8px;
+}
+
+/* Main form container */
 .form {
   display: flex;
   flex-direction: column;
@@ -8,9 +26,9 @@
   margin: 40px auto; /* center horizontally */
   padding: 30px;
 
-  background-color: #ffffff;
+  background-color: #78e67d;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(99, 94, 94, 0.08);
 }
 
 /* Section containing hotel info */
@@ -43,7 +61,7 @@
   flex: 1;
   padding: 10px 12px;
 
-  border: 1px solid #ccc;
+  border: 1px solid #3f4457;
   border-radius: 6px;
   font-size: 14px;
 }
