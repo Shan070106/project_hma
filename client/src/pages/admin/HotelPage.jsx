@@ -26,8 +26,21 @@ function HotelPage() {
     }
 
     const handleSave = (hotelData) => {
+        if (hotel) {
+            // Update existing hotel
+            updateHotel(hotelData);
+        } else {
+            // Create new hotel
+            postHotel(hotelData);
+        }
         console.log(hotelData);
         setEdit(false);
+    }
+
+    const handleSuccess = (msg) => {
+        toast.success(msg,{
+            position: 'top-center'
+        });
     }
 
     const handleError = (errorMessage) => {
@@ -60,6 +73,48 @@ function HotelPage() {
             setLoading(false);
         }
 
+    }
+
+    async function updateHotel(hotelData) {
+         try {
+            const token = localStorage.getItem("token");
+            const response = await axios.put(
+                'http://localhost:5000/api/hotel/me',
+                hotelData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            handleSuccess(response?.data?.message);
+            fetchHotel();
+        } catch (error) {
+            const errorMsg = error?.response?.data?.message || "Server Error on update";
+            console.log(error);
+            handleError(errorMsg);
+        } 
+    }
+
+    async function postHotel(hotelData) {
+         try {
+            const token = localStorage.getItem("token");
+            const response = await axios.post(
+                'http://localhost:5000/api/hotel/create',
+                hotelData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            handleSuccess(response?.data?.message);
+            fetchHotel(); 
+        } catch (error) {
+            const errorMsg = error?.response?.data?.message || "Server Error on post";
+            console.log(error);
+            handleError(errorMsg);
+        } 
     }
 
     if(loading) return <p>Loading the page</p>;
