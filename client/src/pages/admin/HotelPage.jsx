@@ -87,13 +87,15 @@ function HotelPage() {
                     }
                 }
             );
+            console.log(response);
+            setHotel(response?.data?.data);
             handleSuccess(response?.data?.message);
-            fetchHotel();
         } catch (error) {
             const errorMsg = error?.response?.data?.message || "Server Error on update";
             console.log(error);
             handleError(errorMsg);
-        } 
+        }         
+        fetchHotel();
     }
 
     async function postHotel(hotelData) {

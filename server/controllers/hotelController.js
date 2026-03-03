@@ -62,8 +62,11 @@ const updateHotel = asyncHandler(async (req, res) => {
     if (update.menu) hotel.menu = update.menu;
 
     const updatedHotel = await hotel.save();
-    res.status(200);
-    throw new Error(JSON.stringify(updatedHotel));
+    res.status(200).json({
+        success: true,
+        message: "Successfully updated the hotel",
+        data: updatedHotel
+    });
 });
 
 // Delete the authenticated user's hotel (route: DELETE /me)
