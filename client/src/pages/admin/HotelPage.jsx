@@ -4,12 +4,14 @@ import HotelForm from '../../components/admin/hotelpage/HotelForm';
 import ViewHotel from '../../components/admin/hotelpage/ViewHotel';
 import '../../assets/styles/HotelPage.css';
 import axios from 'axios';
+import ConfirmBox from '../../components/ConfirmBox';
 
 function HotelPage() {
 
     const [hotel, setHotel] = useState(null);
     const [edit, setEdit] = useState(false);
     const [loading,setLoading] = useState(true);
+    const [confirm, setConfirm] = useState(false);
 
     useEffect(() => {
         fetchHotel();
@@ -35,6 +37,15 @@ function HotelPage() {
         }
         console.log(hotelData);
         setEdit(false);
+    }
+
+    const handleDeleteClick = () => {
+        setConfirm(true);
+    }
+
+    const handleDelete = () => {
+        console.log(hotel);
+        setConfirm(false);
     }
 
     const handleSuccess = (msg) => {
@@ -119,6 +130,15 @@ function HotelPage() {
         } 
     }
 
+    async function deleteHotel(hotelData) {
+        try {
+            const token = localStorage.getItem("token");
+
+        } catch (error) {
+            
+        }
+    }
+
     if(loading) return <p>Loading the page</p>;
 
     return (
@@ -132,6 +152,7 @@ function HotelPage() {
 
             <div className='btns'>
                 <button onClick={handleEdit}>Edit</button>
+                <button onClick={handleDeleteClick}>Delete</button>
             </div>
 
             {
@@ -157,6 +178,17 @@ function HotelPage() {
                         hotel={hotel} 
                         editable={true} 
                         onSave={handleSave}
+                    />
+                )
+            }
+
+            {
+                confirm && (
+                    <ConfirmBox
+                        header="Delete Confirmation"
+                        message="Are you sure you want to delete this Hotel information?"
+                        onConfirm={handleDelete}
+                        onCancel={() => setConfirm(false)}
                     />
                 )
             }
