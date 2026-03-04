@@ -1,5 +1,6 @@
 // Importing Hotel model
 import Hotel from "../models/Hotel.js";
+import Menu from "../models/Menu.js";
 import asyncHandler from "express-async-handler";
 /* asyncHandler is used to handle exceptions in async functions 
    it catch the error, thrown to the async function and throw it to our global error handler 
@@ -89,6 +90,10 @@ const deleteHotel = asyncHandler(async (req, res) => {
         throw new Error("Not authorized to delete this hotel");
     }
 
+    // Delete all menus associated with this hotel first
+    const deletedMenus = await Menu.deleteMany({ hotel: hotel._id });
+    console.log(`Deleted ${deletedMenus.deletedCount} menus for hotel: ${hotel.name}`);
+
     // Delete images from Cloudinary before deleting hotel
     if(hotel.images && hotel.images.length > 0){
         for(const image of hotel.images){
@@ -100,8 +105,12 @@ const deleteHotel = asyncHandler(async (req, res) => {
     }
 
     await hotel.deleteOne();
-    res.status(200);
-    throw new Error(JSON.stringify({ message: "Hotel deleted successfully" }));
+    // res.status(200);
+    // throw new Error(JSON.stringify({ message: "Hotel deleted successfully" }));
+    res.status(200).json({
+        success: true,
+        message: "Successfully delted the hotel"
+    });
 });
 
 // Create a hotel for the authenticated user (route: POST /create)

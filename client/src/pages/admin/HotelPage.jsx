@@ -45,6 +45,7 @@ function HotelPage() {
 
     const handleDelete = () => {
         console.log(hotel);
+        deleteHotel();
         setConfirm(false);
     }
 
@@ -130,13 +131,24 @@ function HotelPage() {
         } 
     }
 
-    async function deleteHotel(hotelData) {
+    async function deleteHotel() {
         try {
             const token = localStorage.getItem("token");
-
+            const response = await axios.delete(
+                'http://localhost:5000/api/hotel/me',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            handleSuccess(response?.data?.message);
+            setHotel(null); // Clear hotel data after deletion
         } catch (error) {
-            
-        }
+            const errorMsg = error?.response?.data?.message || "Server Error on delete";
+            console.log(error);
+            handleError(errorMsg);
+        } 
     }
 
     if(loading) return <p>Loading the page</p>;
@@ -186,7 +198,7 @@ function HotelPage() {
                 confirm && (
                     <ConfirmBox
                         header="Delete Confirmation"
-                        message="Are you sure you want to delete this Hotel information?"
+                        message="Are you sure you want to delete this Hotel information? All associated menus will also be deleted."
                         onConfirm={handleDelete}
                         onCancel={() => setConfirm(false)}
                     />
