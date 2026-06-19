@@ -3,9 +3,20 @@ import Hotel from "../models/Hotel.js";
 import asyncHandler from "express-async-handler";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
+import mongoose from "mongoose";
+
+const getMenuId = (req) => req.params.id || req.params.menuId;
+
+const validateMenuId = (menuId) => {
+    if (!menuId || !mongoose.Types.ObjectId.isValid(menuId)) {
+        const err = new Error("Valid menu id is required");
+        err.status = 400;
+        throw err;
+    }
+};
 
 const createMenu = asyncHandler(async (req,res) => {
-    const userId = req.userId;
+    const userId = req.user.id;
     
     const hotel = await Hotel.findOne({user: userId});
     if(!hotel){
@@ -13,10 +24,10 @@ const createMenu = asyncHandler(async (req,res) => {
         throw new Error("Hotel not found or create hotel first");
     }
 
-    const { hotelId,name, description, amount, rating, recipe } = req.body || {};
-    if(!name || !amount || !hotelId){
+    const { name, description, amount, rating, recipe } = req.body || {};
+    if(!name || !amount){
         res.status(400);
-        throw new Error("Please provide all required fields: name, amount, hotel");
+        throw new Error("Please provide all required fields: name, amount");
     }
 
     if(!req.file){
@@ -29,7 +40,7 @@ const createMenu = asyncHandler(async (req,res) => {
     fs.unlinkSync(req.file.path);
 
     const menu = await Menu.create({
-        hotel: hotelId,
+        hotel: hotel._id,
         name: name,
         description: description,
         amount: amount,
@@ -40,12 +51,16 @@ const createMenu = asyncHandler(async (req,res) => {
         },
         recipe: recipe,
     });
-    res.status(201).json({ message:"Menu item created", menu });
+    res.status(201).json({
+        success: true,
+        message:"Menu item created", 
+        menu
+    });
 
 });
 
 const getMenuList = asyncHandler( async (req,res) => {
-    const userId = req.userId;
+    const userId = req.user.id;
     
     const hotel = await Hotel.findOne({user: userId});
     if(!hotel){
@@ -54,11 +69,15 @@ const getMenuList = asyncHandler( async (req,res) => {
     }
 
     const menuList = await Menu.find({hotel: hotel._id});
-    res.status(200).json({message: "Menu list for the hotel", menuList});
+    res.status(200).json({
+        success: true,
+        message: "Menu list for the hotel", 
+        menus: menuList
+    });
 });
 
 const getMenu = asyncHandler(async (req,res) => {
-    const userId = req.userId;
+    const userId = req.user.id;
 
     const hotel = await Hotel.findOne({user: userId});
     if(!hotel){
@@ -66,18 +85,24 @@ const getMenu = asyncHandler(async (req,res) => {
         throw new Error("Hotel not found");
     }
 
-    const menuId = req.params.menuId;
+    const menuId = getMenuId(req);
+    validateMenuId(menuId);
+
     const menu = await Menu.findOne({_id: menuId, hotel: hotel._id});
     if(!menu){
         res.status(404);
         throw new Error("Menu item not found");
     }
 
-    res.status(200).json({message: "Menu item that was asked",menu});
+    res.status(200).json({
+        success: true,
+        message: "Menu item that was asked",
+        menu
+    });
 });
 
 const updateMenu = asyncHandler(async (req, res) => {
-    const userId = req.userId;
+    const userId = req.user.id;
 
     const hotel = await Hotel.findOne({user: userId});
     if(!hotel){
@@ -85,7 +110,9 @@ const updateMenu = asyncHandler(async (req, res) => {
         throw new Error("Hotel not found");
     }
 
-    const menuId = req.params.menuId;
+    const menuId = getMenuId(req);
+    validateMenuId(menuId);
+
     const menu = await Menu.findOne({_id: menuId, hotel: hotel._id});
     if(!menu){
         res.status(404);
@@ -117,11 +144,15 @@ const updateMenu = asyncHandler(async (req, res) => {
 
     await menu.save();
 
-    res.status(201).json({message:"Menu updated sucessfully", menu});
+    res.status(201).json({
+        success: true,
+        message: "Menu updated sucessfully", 
+        menu
+    });
 });
 
 const deleteMenu = asyncHandler(async (req,res) => {
-    const userId = req.userId;
+    const userId = req.user.id;
 
     const hotel = await Hotel.findOne({user:userId});
     if(!hotel){
@@ -129,7 +160,8 @@ const deleteMenu = asyncHandler(async (req,res) => {
         throw new Error("Hotel not found");
     }
 
-    const menuId = req.params.menuId;
+    const menuId = getMenuId(req);
+    validateMenuId(menuId);
 
     const menu = await Menu.findOne({_id: menuId,hotel:hotel._id});
     if(!menu){
@@ -145,7 +177,10 @@ const deleteMenu = asyncHandler(async (req,res) => {
 
     await menu.deleteOne();
     
-    res.status(200).json({message: "Menu item deleted successfully"});
+    res.status(200).json({
+        success: true,
+        message: "Menu item deleted successfully"
+    });
 });
 
 export { createMenu, getMenuList, getMenu, updateMenu, deleteMenu };

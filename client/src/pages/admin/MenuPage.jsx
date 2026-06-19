@@ -1,5 +1,6 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 import "../../assets/styles/MenuPage.css";
 import MenuSample from "../../sample data/MenuSample";
 import MenuForm from "../../components/admin/menupage/MenuForm";
@@ -8,50 +9,128 @@ import DisplayMenu from "../../components/admin/menupage/DisplayMenu";
 function MenuPage() {
     const [mode, setMode] = useState("list"); // mode : list | form 
     const [opened, setOpened] = useState(null);
-    const [editable, setEdit] = useState(false);
-    const [menuItems,setMenuItem] = useState(MenuSample);
+    const [editable, setEditable] = useState(false);
+    const [menuItems,setMenuItem] = useState([]);
+
+    const handleSuccess = (successMessage) => {
+        toast.success(successMessage,{
+            position: 'top-center'
+        });
+    }
+
+    const handleError = (errorMessage) => {
+        toast.error(errorMessage,{ 
+            position: 'top-center' 
+        });
+    }
 
     // menuList fectched from server side later...
     // const menuList = menuItems;
     // const menuList = [];
 
+    useEffect(() => {
+        fetchMenuItems();
+    }, []); 
+
     const handleAdd = () => {
         setOpened(null);
+        setEditable(true);
         setMode("form");
-        setEdit(true);
     }
 
     const handleOpen = (menu) => {
         setMode("form");
-        setEdit(false);
+        setEditable(false);
         setOpened(menu);
     }
 
-    const handleSave = (menuData) => {
-        menuData.forEach((key,value) => {
-            console.log(key, value);
-        });
+    const handleBack = () => {
+        setMode("list");
+        setOpened(null);
+        setEditable(false);
+        fetchMenuItems(); // Refresh menu list when returning from form
+    }
 
-        setEdit(false);
-        setMenuItem(prevMenuItems => [...prevMenuItems,menuData]);
-        // setMode("list");
-        // setOpened(null);
+    const getMenuId = (menu) => menu?._id || menu?.id;
+
+    const handleSave = async (menuData) => {
+        try {
+            const token = localStorage.getItem("token");
+            
+            if (opened) {
+                const menuId = getMenuId(opened);
+                if (!menuId) {
+                    throw new Error("Selected menu id is missing");
+                }
+
+                // Update existing menu
+                await axios.put(
+                    `http://localhost:5000/api/menu/${menuId}`,
+                    menuData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                );
+                handleSuccess("Menu updated successfully");
+            } else {
+                // Create new menu
+                await axios.post(
+                    'http://localhost:5000/api/menu/create',
+                    menuData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                );
+                handleSuccess("Menu created successfully");
+            }
+            
+            fetchMenuItems(); // Refresh menu list after save
+            handleBack();
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || "Failed to save menu item";
+            console.error("Error saving menu item:", errorMessage);
+            handleError(errorMessage);
+        }
     }
 
     const handleEdit = () => {
-        setEdit(true);
+        if (opened) {
+            setEditable(true);
+        }
+    }
+
+    const isEditMode = () => {
+        return editable;
     }
 
     const handleCancel = () => {
-        setOpened(null);
-        setMode("list");
-        setEdit(false);
+        setEditable(false);
+        handleBack();
     }
 
-    const onBack = () => {
-        setMode("list");
-        setOpened(null);
-        setEdit(false);
+    async function fetchMenuItems() {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(
+                'http://localhost:5000/api/menu/list',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            setMenuItem(response.data.menus || []); // Extract menus array from response
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Failed to fetch menu items";
+            console.error("Error fetching menu items:", errorMessage);
+            handleError(errorMessage);
+        }
     }
 
     return (
@@ -83,14 +162,15 @@ function MenuPage() {
                     mode === "form" &&
                     < MenuForm
                         menu={opened}
-                        edit={editable}
-                        onSave={handleSave}
-                        onCancel={handleCancel}
+                        edit={isEditMode()}
                         onEdit={handleEdit}
-                        onBack={onBack}
+                        onCancel={handleCancel}
+                        onSave={handleSave}
+                        onBack={handleBack}
                     />
                 }
             </main>
+            <ToastContainer/>
         </div>
     );
 }

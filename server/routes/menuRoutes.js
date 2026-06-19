@@ -17,6 +17,8 @@ router.post(
 
 router.get('/list', requireAuth, getMenuList);
 
+router.get('/hotel/:hotelId', displayMenu);
+
 router.get('/:id', requireAuth, getMenu);
 
 router.put(
@@ -27,8 +29,6 @@ router.put(
 );
 
 router.delete( '/:id', requireAuth, deleteMenu );
-
-router.get('/hotel/:hotelId', displayMenu);
 
 export default router;
 
