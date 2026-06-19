@@ -18,10 +18,10 @@ function MenuBox({menuId,menu,open}) {
 
 
 function DisplayMenu({ menus,open }) {
-    console.log(menus.map((m)=>m._id))
     const MenuList = menus.map(menuItem => {
         return < MenuBox 
-            key={menuItem._id}
+            key={menuItem._id || menuItem.id}
+            menuId={menuItem._id || menuItem.id}
             menu={menuItem}
             open={open}
         />

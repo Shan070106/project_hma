@@ -1,22 +1,9 @@
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
+import ImageInput from "../../ImageInput";
 
-import noImage from "../../../assets/images/no-image.jpg";
 import "./MenuForm.css";
-
-function MenuImageInput({ perviewUrl, onImageClick }) {
-    return (
-        <div className="image-input">
-            {perviewUrl && <img src={perviewUrl || noImage} alt="Dish image" /> }
-           { 
-           <input
-                type="file"
-                accept="image/*"
-                onChange={onImageClick}
-            />}
-        </div>
-    );
-}
-
 
 function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
     const [menuForm, setForm] = useState({
@@ -29,6 +16,7 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
     });
 
     const [menuImageFile, setImageFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null); // Store actual File object
 
     useEffect(() => {
         if (menu) {
@@ -48,6 +36,14 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
 
     }, [menu]);
 
+    const handleEdit = () => {
+        if (onEdit) onEdit();
+    }
+
+    const handleCancel = () => {
+        if (onCancel) onCancel();
+    }
+
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -57,8 +53,8 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
             menuData.append(key, value);
         });
 
-        if (menuImageFile)
-            menuData.append("image",menuImageFile);
+        if (selectedFile)
+            menuData.append("image", selectedFile); // Send actual File object
 
         if (onSave)
             onSave(menuData);
@@ -79,14 +75,14 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
             avail: menu?.avail ? "yes" : "no"
         });
 
-        if (menuImageFile) {
-            setImageFile(menu.image?.url || noImage);
-        }
+        setImageFile(menu?.image?.url || null);
+        setSelectedFile(null); // Clear actual file
     }
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            setSelectedFile(file); // Store actual File object
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImageFile(reader.result); // URL for preview
@@ -96,42 +92,114 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
     };
 
     return (
-    <>
-        <button type="button" onClick={onBack}>{"<- back"}</button>
-            
-        <div className="menu-form">
-            <MenuImageInput
-                perviewUrl={menuImageFile || noImage}
-                onImageClick={handleImageChange}
-                />
-            <form className="form" onSubmit={handleSubmit}>
-                {
-                    Object.entries(menuForm).map(([key, value]) => (
-                        <div key={key} className='menu-row'>
-                            <label htmlFor={key}>{key.replace(/^\w/, c => c.toUpperCase())}</label>
-                            <input
-                                key={key}
-                                name={key}
-                                value={value}
-                                onChange={handleChange}
-                                readOnly={!edit} />
-                        </div>
-                    ))
-                }
+        <div className='form'>
+            {/* Back Button */}
+            <button type="button" onClick={onBack}>{"<- back"}</button>
 
-                {
-                    (edit &&
-                        <div>
+            {/* Image Section */}
+            <div className="form-section">
+                <h3>Image</h3>
+                <ImageInput
+                    perviewUrl={menuImageFile}
+                    onImageClick={handleImageChange}
+                />
+            </div>
+
+            {/* Info Section */}
+            <div className="form-section">
+                <h3>Info</h3>
+                <div className='menu-row'>
+                    <label htmlFor="name">Name</label>
+                    <input 
+                        id="name"
+                        type="text"
+                        name="name"
+                        value={menuForm.name}   
+                        onChange={handleChange}
+                        readOnly={!edit}
+                    />
+                </div>
+                <div className='menu-row'>
+                    <label htmlFor="description">Description</label>
+                    <textarea 
+                        id="description"
+                        name="description"
+                        value={menuForm.description}   
+                        onChange={handleChange}
+                        readOnly={!edit}
+                        rows="3"
+                    />
+                </div>
+                <div className='menu-row'>
+                    <label htmlFor="amount">Amount</label>
+                    <input 
+                        id="amount"
+                        type="number"
+                        name="amount"
+                        value={menuForm.amount}   
+                        onChange={handleChange}
+                        readOnly={!edit}
+                    />
+                </div>
+                <div className='menu-row'>
+                    <label htmlFor="rating">Rating</label>
+                    <select 
+                        id="rating"
+                        name="rating"
+                        value={menuForm.rating}   
+                        onChange={handleChange}
+                        disabled={!edit}
+                    >
+                        <option value="">Select Rating</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div className='menu-row'>
+                    <label htmlFor="avail">Available</label>
+                    <select 
+                        id="avail"
+                        name="avail"
+                        value={menuForm.avail}   
+                        onChange={handleChange}
+                        disabled={!edit}
+                    >
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div className='menu-row'>
+                    <label htmlFor="recipe">Recipe</label>
+                    <textarea 
+                        id="recipe"
+                        name="recipe"
+                        value={menuForm.recipe}   
+                        onChange={handleChange}
+                        readOnly={!edit}
+                        rows="3"
+                    />
+                </div>
+            </div>
+
+            {/* Buttons */}
+            {
+                ( edit &&
+                    <div className='btn-section'>
+                        <form onSubmit={handleSubmit}>
                             <button type="submit"> Save </button>
-                            <button type="button" onClick={handleReset}> Reset </button>
-                            <button type="button" onClick={onCancel}> Cancel </button>
-                        </div>
-                    )
-                }
-                {menu && <button type="button" onClick={onEdit}>Edit</button>}
-            </form>
+                            <button type="button" id="reset-btn" onClick={handleReset}> Reset </button>                          
+                            <button type="button" id="cancel-btn" onClick={handleCancel}> Cancel </button>
+                        </form>
+                    </div>
+                )
+            }
+            
+            {menu && <button type="button" onClick={handleEdit}>Edit</button>}
+            <ToastContainer />
         </div>
-        </>
     );
 }
 
