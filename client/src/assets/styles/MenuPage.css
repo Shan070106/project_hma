@@ -26,7 +26,7 @@
 
 /* Main content */
 .menu-page main {
-  background: #fafafa;
+  background: #dba2057e;
   padding: 24px;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -46,6 +46,31 @@
 
 .menu-page main > button:hover {
   background-color: #0056b3;
+}
+
+.menu-bulk-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.menu-bulk-actions button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #dc3545;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.menu-bulk-actions button:hover:not(:disabled) {
+  background-color: #a71d2a;
+}
+
+.menu-bulk-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 /* Empty state text */

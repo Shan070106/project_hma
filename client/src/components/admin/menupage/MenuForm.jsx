@@ -1,40 +1,30 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import axios from "axios";
 import ImageInput from "../../ImageInput";
+import { deleteMenuItem } from "../../../services/menuService";
 
 import "./MenuForm.css";
 
+const buildMenuForm = (menu) => ({
+    name: menu?.name || "",
+    description: menu?.description || "",
+    amount: menu?.amount || "",
+    rating: menu?.rating || "",
+    recipe: menu?.recipe || "",
+    avail: menu ? (menu.avail ? "yes" : "no") : ""
+});
+
+const getMenuImageUrl = (menu) => menu?.image?.url || null;
+const getMenuId = (menu) => menu?._id || menu?.id;
+
 function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
-    const [menuForm, setForm] = useState({
-        name: "",
-        description: "",
-        amount: "",
-        rating: "",
-        recipe: "",
-        avail: ""
-    });
-
-    const [menuImageFile, setImageFile] = useState(null);
+    const [menuForm, setForm] = useState(() => buildMenuForm(menu));
+    const [menuImageFile, setImageFile] = useState(() => getMenuImageUrl(menu));
     const [selectedFile, setSelectedFile] = useState(null); // Store actual File object
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
-    useEffect(() => {
-        if (menu) {
-            setForm({
-                name: menu.name || "",
-                description: menu.description || "",
-                amount: menu.amount || "",
-                rating: menu.rating || "",
-                recipe: menu.recipe || "",
-                avail: menu.avail ? "yes" : "no"
-            });
-            
-            if (menu.image?.url) {
-                setImageFile(menu.image.url);
-            }
-        }
-
-    }, [menu]);
+    const isExistingMenu = Boolean(getMenuId(menu));
 
     const handleEdit = () => {
         if (onEdit) onEdit();
@@ -66,17 +56,42 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
     }
 
     const handleReset = () => {
-        setForm({
-            name: menu?.name || "",
-            description: menu?.description || "",
-            amount: menu?.amount || "",
-            rating: menu?.rating || "",
-            recipe: menu?.recipe || "",
-            avail: menu?.avail ? "yes" : "no"
-        });
-
-        setImageFile(menu?.image?.url || null);
+        setForm(buildMenuForm(menu));
+        setImageFile(getMenuImageUrl(menu));
         setSelectedFile(null); // Clear actual file
+    }
+
+    const handleDeleteClick = () => {
+        setShowDeleteConfirm(true);
+    }
+
+    const handleDeleteCancel = () => {
+        if (!deleting) {
+            setShowDeleteConfirm(false);
+        }
+    }
+
+    const handleDeleteConfirm = async () => {
+        const menuId = getMenuId(menu);
+        if (!menuId) return;
+
+        setDeleting(true);
+        try {
+            await deleteMenuItem(menuId);
+            toast.success("Menu item deleted successfully", {
+                position: "top-center"
+            });
+            setShowDeleteConfirm(false);
+            if (onBack) onBack();
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Failed to delete menu item";
+            console.error("Error deleting menu item:", errorMessage);
+            toast.error(errorMessage, {
+                position: "top-center"
+            });
+        } finally {
+            setDeleting(false);
+        }
     }
 
     const handleImageChange = (e) => {
@@ -92,10 +107,7 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
     };
 
     return (
-        <div className='form'>
-            {/* Back Button */}
-            <button type="button" onClick={onBack}>{"<- back"}</button>
-
+        <div className='menu-form'>
             {/* Image Section */}
             <div className="form-section">
                 <h3>Image</h3>
@@ -184,20 +196,76 @@ function MenuForm({ menu, edit, onEdit, onCancel, onSave, onBack }) {
                 </div>
             </div>
 
-            {/* Buttons */}
-            {
-                ( edit &&
-                    <div className='btn-section'>
-                        <form onSubmit={handleSubmit}>
-                            <button type="submit"> Save </button>
-                            <button type="button" id="reset-btn" onClick={handleReset}> Reset </button>                          
-                            <button type="button" id="cancel-btn" onClick={handleCancel}> Cancel </button>
-                        </form>
+            <div className="menu-action-bar">
+                <button type="button" className="action-btn action-btn-neutral" onClick={onBack}>
+                    Back
+                </button>
+
+                <div className="menu-action-group">
+                    {edit ? (
+                        <>
+                            <button type="button" className="action-btn action-btn-neutral" onClick={handleReset}>
+                                Reset
+                            </button>
+                            <button type="button" className="action-btn action-btn-neutral" onClick={handleCancel}>
+                                Cancel
+                            </button>
+                            <button type="button" className="action-btn action-btn-primary" onClick={handleSubmit}>
+                                Save
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            {isExistingMenu && (
+                                <button type="button" className="action-btn action-btn-secondary" onClick={handleEdit}>
+                                    Edit
+                                </button>
+                            )}
+                            {isExistingMenu && (
+                                <button
+                                    type="button"
+                                    className="action-btn action-btn-destructive"
+                                    onClick={handleDeleteClick}
+                                    disabled={deleting}
+                                >
+                                    {deleting ? "Deleting..." : "Delete"}
+                                </button>
+                            )}
+                        </>
+                    )}
+                </div>
+            </div>
+
+            {showDeleteConfirm && (
+                <div className="menu-modal-backdrop" role="presentation">
+                    <div className="menu-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-menu-title">
+                        <h3 id="delete-menu-title">Delete Menu Item</h3>
+                        <p>
+                            Are you sure you want to delete '{menu?.name}'? This action cannot be undone.
+                        </p>
+
+                        <div className="menu-dialog-actions">
+                            <button
+                                type="button"
+                                className="action-btn action-btn-neutral"
+                                onClick={handleDeleteCancel}
+                                disabled={deleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="action-btn action-btn-destructive"
+                                onClick={handleDeleteConfirm}
+                                disabled={deleting}
+                            >
+                                {deleting ? "Deleting..." : "Delete"}
+                            </button>
+                        </div>
                     </div>
-                )
-            }
-            
-            {menu && <button type="button" onClick={handleEdit}>Edit</button>}
+                </div>
+            )}
+
             <ToastContainer />
         </div>
     );

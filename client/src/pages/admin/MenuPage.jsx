@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import axios from "axios";
 import "../../assets/styles/MenuPage.css";
-import MenuSample from "../../sample data/MenuSample";
 import MenuForm from "../../components/admin/menupage/MenuForm";
 import DisplayMenu from "../../components/admin/menupage/DisplayMenu";
+import {
+    createMenuItem,
+    deleteMenuItem,
+    deleteMultipleMenuItems,
+    getMenuItems,
+    updateMenuItem
+} from "../../services/menuService";
 
 function MenuPage() {
     const [mode, setMode] = useState("list"); // mode : list | form 
     const [opened, setOpened] = useState(null);
     const [editable, setEditable] = useState(false);
     const [menuItems,setMenuItem] = useState([]);
+    const [selectedMenuIds, setSelectedMenuIds] = useState([]);
+    const [deleting, setDeleting] = useState(false);
 
     const handleSuccess = (successMessage) => {
         toast.success(successMessage,{
@@ -53,10 +60,20 @@ function MenuPage() {
 
     const getMenuId = (menu) => menu?._id || menu?.id;
 
+    const visibleMenuIds = menuItems.map(getMenuId).filter(Boolean);
+
+    const clearDeletedMenuItems = (deletedIds) => {
+        const deletedIdSet = new Set(deletedIds);
+        setMenuItem((currentItems) =>
+            currentItems.filter((menuItem) => !deletedIdSet.has(getMenuId(menuItem)))
+        );
+        setSelectedMenuIds((currentIds) =>
+            currentIds.filter((menuId) => !deletedIdSet.has(menuId))
+        );
+    }
+
     const handleSave = async (menuData) => {
         try {
-            const token = localStorage.getItem("token");
-            
             if (opened) {
                 const menuId = getMenuId(opened);
                 if (!menuId) {
@@ -64,34 +81,19 @@ function MenuPage() {
                 }
 
                 // Update existing menu
-                await axios.put(
-                    `http://localhost:5000/api/menu/${menuId}`,
-                    menuData,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    }
-                );
+                const response = await updateMenuItem(menuId, menuData);
+                setOpened(response.data.menu || opened);
+                setEditable(false);
                 handleSuccess("Menu updated successfully");
             } else {
                 // Create new menu
-                await axios.post(
-                    'http://localhost:5000/api/menu/create',
-                    menuData,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    }
-                );
+                await createMenuItem(menuData);
                 handleSuccess("Menu created successfully");
+                handleBack();
+                return;
             }
             
             fetchMenuItems(); // Refresh menu list after save
-            handleBack();
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || "Failed to save menu item";
             console.error("Error saving menu item:", errorMessage);
@@ -116,20 +118,71 @@ function MenuPage() {
 
     async function fetchMenuItems() {
         try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get(
-                'http://localhost:5000/api/menu/list',
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+            const response = await getMenuItems();
             setMenuItem(response.data.menus || []); // Extract menus array from response
+            setSelectedMenuIds([]);
         } catch (error) {
             const errorMessage = error.response?.data?.message || "Failed to fetch menu items";
             console.error("Error fetching menu items:", errorMessage);
             handleError(errorMessage);
+        }
+    }
+
+    const handleSelectionChange = (menuId, checked) => {
+        setSelectedMenuIds((currentIds) => {
+            if (checked) {
+                return currentIds.includes(menuId) ? currentIds : [...currentIds, menuId];
+            }
+
+            return currentIds.filter((currentId) => currentId !== menuId);
+        });
+    }
+
+    const handleSelectAllChange = (checked) => {
+        setSelectedMenuIds(checked ? visibleMenuIds : []);
+    }
+
+    const handleDeleteMenuItem = async (menu) => {
+        const menuId = getMenuId(menu);
+        if (!menuId) {
+            handleError("Selected menu id is missing");
+            return;
+        }
+
+        const confirmed = window.confirm(`Delete '${menu.name}'? This action cannot be undone.`);
+        if (!confirmed) return;
+
+        setDeleting(true);
+        try {
+            await deleteMenuItem(menuId);
+            clearDeletedMenuItems([menuId]);
+            handleSuccess("Menu item deleted successfully");
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Failed to delete menu item";
+            console.error("Error deleting menu item:", errorMessage);
+            handleError(errorMessage);
+        } finally {
+            setDeleting(false);
+        }
+    }
+
+    const handleDeleteSelected = async () => {
+        if (selectedMenuIds.length === 0) return;
+
+        const confirmed = window.confirm(`Delete ${selectedMenuIds.length} selected items?`);
+        if (!confirmed) return;
+
+        setDeleting(true);
+        try {
+            await deleteMultipleMenuItems(selectedMenuIds);
+            clearDeletedMenuItems(selectedMenuIds);
+            handleSuccess("Selected menu items deleted successfully");
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Failed to delete selected menu items";
+            console.error("Error deleting selected menu items:", errorMessage);
+            handleError(errorMessage);
+        } finally {
+            setDeleting(false);
         }
     }
 
@@ -151,7 +204,29 @@ function MenuPage() {
                             {menuItems.length === 0 ? (
                                 <p>No menu added yet...!</p>
                             ) : (
-                                <DisplayMenu menus={menuItems} open={handleOpen} />
+                                <>
+                                    {selectedMenuIds.length > 0 && (
+                                        <div className="menu-bulk-actions">
+                                            <button
+                                                type="button"
+                                                onClick={handleDeleteSelected}
+                                                disabled={deleting}
+                                            >
+                                                {deleting ? "Deleting..." : "Delete Selected"}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    <DisplayMenu
+                                        menus={menuItems}
+                                        open={handleOpen}
+                                        selectedMenuIds={selectedMenuIds}
+                                        onSelectMenu={handleSelectionChange}
+                                        onSelectAll={handleSelectAllChange}
+                                        onDeleteMenu={handleDeleteMenuItem}
+                                        deleting={deleting}
+                                    />
+                                </>
                             )}
                         </>
                     )
@@ -161,6 +236,7 @@ function MenuPage() {
                 {
                     mode === "form" &&
                     < MenuForm
+                        key={`${getMenuId(opened) || "new-menu"}-${editable ? "edit" : "view"}`}
                         menu={opened}
                         edit={isEditMode()}
                         onEdit={handleEdit}
