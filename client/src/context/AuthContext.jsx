@@ -2,19 +2,25 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { login as loginApi, signup as signupApi, me as meApi } from "../services/authService";
 
 const AuthContext = createContext(null);
-export const useAuth = () => useContext(AuthContext);
 
-export default function AuthProvider({ children }) {
+const useAuth = () => useContext(AuthContext);
+
+function AuthProvider({ children }) {
   const [user, setUser] = useState(null);     // {id, name, email}
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) { setLoading(false); return; }
+    if (!token) {
+       setLoading(false); 
+       return;
+    }
+
     meApi()
       .then(({ user }) => setUser(user))
       .catch(() => localStorage.removeItem("token"))
       .finally(() => setLoading(false));
+      
   }, []);
 
   const login = async (email, password) => {
@@ -40,3 +46,5 @@ export default function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
+export default  {AuthProvider, useAuth };
