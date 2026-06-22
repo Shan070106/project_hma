@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "../../assets/styles/MenuPage.css";
+import Toolbar from "../../components/Toolbar";
 import MenuForm from "../../components/admin/menupage/MenuForm";
 import DisplayMenu from "../../components/admin/menupage/DisplayMenu";
 import {
@@ -10,6 +11,7 @@ import {
     getMenuItems,
     updateMenuItem
 } from "../../services/menuService";
+import ConfirmBox from "../../components/ConfirmBox";
 
 function MenuPage() {
     const [mode, setMode] = useState("list"); // mode : list | form 
@@ -18,6 +20,7 @@ function MenuPage() {
     const [menuItems,setMenuItem] = useState([]);
     const [selectedMenuIds, setSelectedMenuIds] = useState([]);
     const [deleting, setDeleting] = useState(false);
+    const [confirmConfig, setConfirmConfig] = useState(null);
 
     const handleSuccess = (successMessage) => {
         toast.success(successMessage,{
@@ -148,11 +151,11 @@ function MenuPage() {
             handleError("Selected menu id is missing");
             return;
         }
+        console.log(menu);
+        // const confirmed = window.confirm(`Delete '${menu.name}'? This action cannot be undone.`);
+        // if (!confirmed) return;
 
-        const confirmed = window.confirm(`Delete '${menu.name}'? This action cannot be undone.`);
-        if (!confirmed) return;
-
-        setDeleting(true);
+        // setDeleting(true);
         try {
             await deleteMenuItem(menuId);
             clearDeletedMenuItems([menuId]);
@@ -169,9 +172,9 @@ function MenuPage() {
     const handleDeleteSelected = async () => {
         if (selectedMenuIds.length === 0) return;
 
-        const confirmed = window.confirm(`Delete ${selectedMenuIds.length} selected items?`);
-        if (!confirmed) return;
-
+        // const confirmed = window.confirm(`Delete ${selectedMenuIds.length} selected items?`);
+        // if (!confirmed) return;
+        console.log(selectedMenuIds);
         setDeleting(true);
         try {
             await deleteMultipleMenuItems(selectedMenuIds);
@@ -186,6 +189,35 @@ function MenuPage() {
         }
     }
 
+    const handleDeleteOperation = (selectedMenu) => {
+        setDeleting(true);
+        if (selectedMenu === null) {
+            setConfirmConfig({
+                header : "Delete Selected Items",
+                message : `Delete ${selectedMenuIds.length} selected items?`,
+                onConfirm : handleDeleteSelected,
+                onCancel : () => setDeleting(false)
+            });
+        } else if (selectedMenu !== null) {
+            setConfirmConfig({
+                header: "Delete Menu Item",
+                message: `Delete '${selectedMenu.name}'? This action cannot be undone.`,
+                onConfirm: () => handleDeleteMenuItem(selectedMenu),
+                onCancel: () => setDeleting(false)
+            });
+        }
+    }
+
+    const tools = [
+        {
+            index: "add",
+            label: "Add",
+            onClick: handleAdd,
+            disabled: deleting,
+            className: "primary-btn"
+        }
+    ]
+
     return (
         <div className="menu-page">
             <header>
@@ -199,7 +231,7 @@ function MenuPage() {
                     mode === "list" &&
                     (
                         <>
-                            <button onClick={handleAdd}>ADD</button>
+                            <Toolbar tools={tools} />
 
                             {menuItems.length === 0 ? (
                                 <p>No menu added yet...!</p>
@@ -209,7 +241,7 @@ function MenuPage() {
                                         <div className="menu-bulk-actions">
                                             <button
                                                 type="button"
-                                                onClick={handleDeleteSelected}
+                                                onClick={() => handleDeleteOperation(null)}
                                                 disabled={deleting}
                                             >
                                                 {deleting ? "Deleting..." : "Delete Selected"}
@@ -223,9 +255,17 @@ function MenuPage() {
                                         selectedMenuIds={selectedMenuIds}
                                         onSelectMenu={handleSelectionChange}
                                         onSelectAll={handleSelectAllChange}
-                                        onDeleteMenu={handleDeleteMenuItem}
+                                        onDeleteMenu={(menu) => handleDeleteOperation(menu)}
                                         deleting={deleting}
                                     />
+
+                                    {deleting && <ConfirmBox 
+                                        header={confirmConfig.header}
+                                        message={confirmConfig.message}
+                                        onConfirm={confirmConfig.onConfirm}
+                                        onCancel={confirmConfig.onCancel}
+                                    />
+                                    }
                                 </>
                             )}
                         </>
