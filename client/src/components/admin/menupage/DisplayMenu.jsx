@@ -44,22 +44,7 @@ function DisplayMenu({
 }) {
     const visibleMenuIds = menus.map((menuItem) => menuItem._id || menuItem.id).filter(Boolean);
     const allSelected = visibleMenuIds.length > 0 && visibleMenuIds.every((menuId) => selectedMenuIds.includes(menuId));
-
-    const MenuList = menus.map(menuItem => {
-        const menuId = menuItem._id || menuItem.id;
-
-        return < MenuBox 
-            key={menuId}
-            menuId={menuId}
-            menu={menuItem}
-            open={open}
-            selected={selectedMenuIds.includes(menuId)}
-            onSelectMenu={onSelectMenu}
-            onDeleteMenu={onDeleteMenu}
-            deleting={deleting}
-        />
-    });
-
+ 
     return (
         <>
         <table>
@@ -85,7 +70,22 @@ function DisplayMenu({
         </thead>
 
         <tbody>
-                  {MenuList}
+                {
+                    menus.map(menuItem => {
+                        const menuId = menuItem._id || menuItem.id;
+
+                        return < MenuBox
+                            key={menuId}
+                            menuId={menuId}
+                            menu={menuItem}
+                            open={open}
+                            selected={selectedMenuIds.includes(menuId)}
+                            onSelectMenu={onSelectMenu}
+                            onDeleteMenu={onDeleteMenu}
+                            deleting={deleting}
+                        />
+                    })
+                }
         </tbody>
 
         </table>
