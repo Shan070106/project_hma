@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
 import "../../assets/styles/MenuPage.css";
 import Toolbar from "../../components/Toolbar";
 import MenuForm from "../../components/admin/menupage/MenuForm";
@@ -12,6 +11,7 @@ import {
     updateMenuItem
 } from "../../services/menuService";
 import ConfirmBox from "../../components/ConfirmBox";
+import NoticeBox from "../../components/NoticeBox";
 
 function MenuPage() {
     const [mode, setMode] = useState("list"); // mode : list | form 
@@ -21,17 +21,10 @@ function MenuPage() {
     const [selectedMenuIds, setSelectedMenuIds] = useState([]);
     const [deleting, setDeleting] = useState(false);
     const [confirmConfig, setConfirmConfig] = useState(null);
+    const [notice, setNotice] = useState({message: "", type: ""})
 
-    const handleSuccess = (successMessage) => {
-        toast.success(successMessage,{
-            position: 'top-center'
-        });
-    }
-
-    const handleError = (errorMessage) => {
-        toast.error(errorMessage,{ 
-            position: 'top-center' 
-        });
+    const handleNotice = (message, type) => {
+        setNotice({message, type});
     }
 
     // menuList fectched from server side later...
@@ -87,11 +80,11 @@ function MenuPage() {
                 const response = await updateMenuItem(menuId, menuData);
                 setOpened(response.data.menu || opened);
                 setEditable(false);
-                handleSuccess("Menu updated successfully");
+                handleNotice("Menu updated successfully", "success");
             } else {
                 // Create new menu
                 await createMenuItem(menuData);
-                handleSuccess("Menu created successfully");
+                handleNotice("Menu created successfully", "success");
                 handleBack();
                 return;
             }
@@ -100,7 +93,7 @@ function MenuPage() {
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || "Failed to save menu item";
             console.error("Error saving menu item:", errorMessage);
-            handleError(errorMessage);
+            handleNotice(errorMessage, "error");
         }
     }
 
@@ -127,7 +120,7 @@ function MenuPage() {
         } catch (error) {
             const errorMessage = error.response?.data?.message || "Failed to fetch menu items";
             console.error("Error fetching menu items:", errorMessage);
-            handleError(errorMessage);
+            handleNotice(errorMessage, "error");
         }
     }
 
@@ -148,22 +141,19 @@ function MenuPage() {
     const handleDeleteMenuItem = async (menu) => {
         const menuId = getMenuId(menu);
         if (!menuId) {
-            handleError("Selected menu id is missing");
+            handleNotice("Selected menu id is missing", "error");
             return;
         }
         console.log(menu);
-        // const confirmed = window.confirm(`Delete '${menu.name}'? This action cannot be undone.`);
-        // if (!confirmed) return;
-
-        // setDeleting(true);
+    
         try {
             await deleteMenuItem(menuId);
             clearDeletedMenuItems([menuId]);
-            handleSuccess("Menu item deleted successfully");
+            handleNotice("Menu item deleted successfully", "success");
         } catch (error) {
             const errorMessage = error.response?.data?.message || "Failed to delete menu item";
             console.error("Error deleting menu item:", errorMessage);
-            handleError(errorMessage);
+            handleNotice(errorMessage, "error");
         } finally {
             setDeleting(false);
         }
@@ -172,18 +162,16 @@ function MenuPage() {
     const handleDeleteSelected = async () => {
         if (selectedMenuIds.length === 0) return;
 
-        // const confirmed = window.confirm(`Delete ${selectedMenuIds.length} selected items?`);
-        // if (!confirmed) return;
         console.log(selectedMenuIds);
         setDeleting(true);
         try {
             await deleteMultipleMenuItems(selectedMenuIds);
             clearDeletedMenuItems(selectedMenuIds);
-            handleSuccess("Selected menu items deleted successfully");
+            handleNotice("Selected menu items deleted successfully", "success");
         } catch (error) {
             const errorMessage = error.response?.data?.message || "Failed to delete selected menu items";
             console.error("Error deleting selected menu items:", errorMessage);
-            handleError(errorMessage);
+            handleNotice(errorMessage, "error");
         } finally {
             setDeleting(false);
         }
@@ -232,7 +220,7 @@ function MenuPage() {
                     (
                         <>
                             <Toolbar tools={tools} />
-
+                            {notice && <NoticeBox message={notice.message} type={notice.type} />}
                             {menuItems.length === 0 ? (
                                 <p>No menu added yet...!</p>
                             ) : (
@@ -286,7 +274,6 @@ function MenuPage() {
                     />
                 }
             </main>
-            <ToastContainer/>
         </div>
     );
 }
